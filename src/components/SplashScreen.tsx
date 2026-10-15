@@ -43,14 +43,14 @@ export function SplashScreen({
       {/* Background Image with Ambient Gradient Overlays */}
       <div className="absolute inset-0 z-0">
         <Image
-          src={currentSlide === 1 ? "/splash-livingroom.jpg" : "/splash-building.jpg"}
+          src={currentSlide === 1 ? "/splash-villa-luxury.jpg" : "/splash-building.jpg"}
           alt="House Haven Atmosphere"
           fill
           priority
           className="object-cover transition-all duration-700 ease-in-out scale-100"
         />
         {/* Subtle Top Vignette Overlay for logo readability */}
-        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/60 to-transparent pointer-events-none"></div>
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/70 to-transparent pointer-events-none"></div>
         {/* Bottom Dark Gradient Overlay focused precisely behind text & buttons */}
         <div className="absolute inset-x-0 bottom-0 h-[56%] bg-gradient-to-t from-black/95 via-black/75 to-transparent pointer-events-none"></div>
       </div>
@@ -61,9 +61,9 @@ export function SplashScreen({
           <Image
             src="/logo-2.png"
             alt="House Haven"
-            width={52}
-            height={52}
-            className="object-contain drop-shadow-md"
+            width={78}
+            height={78}
+            className="w-[72px] sm:w-[78px] h-auto object-contain drop-shadow-xl"
             priority
           />
         </div>
