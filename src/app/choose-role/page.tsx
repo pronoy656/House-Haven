@@ -9,12 +9,15 @@ export default function ChooseRolePage() {
   const router = useRouter();
 
   const handleContinue = (role: string) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("userRole", role);
+    }
     if (role === "landlord") {
-      router.push("/onboarding/landlord");
+      router.push("/landlord/onboarding");
     } else if (role === "tenant") {
       router.push("/signup?role=tenant");
     } else {
-      router.push("/signup?role=services");
+      router.push("/signup?role=service");
     }
   };
 

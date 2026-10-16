@@ -12,7 +12,16 @@ export default function LoginPage() {
     <MobileContainer>
       <WelcomeBackScreen
         onNavigateToSignUp={() => router.push("/choose-role")}
-        onLoginSuccess={() => router.push("/dashboard")}
+        onLoginSuccess={() => {
+          const role = typeof window !== "undefined" ? localStorage.getItem("userRole") : null;
+          if (role === "tenant") {
+            router.push("/tenant/dashboard");
+          } else if (role === "services" || role === "service") {
+            router.push("/services?role=service");
+          } else {
+            router.push("/landlord/dashboard");
+          }
+        }}
         showStatusBar={true}
       />
     </MobileContainer>

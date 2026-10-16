@@ -16,10 +16,15 @@ function OtpContent() {
       email={email}
       onBack={() => router.push(`/signup?role=${role}`)}
       onVerifySuccess={() => {
-        if (role === "services") {
-          router.push("/services");
+        if (typeof window !== "undefined") {
+          localStorage.setItem("userRole", role);
+        }
+        if (role === "services" || role === "service") {
+          router.push("/services?role=service");
+        } else if (role === "tenant") {
+          router.push("/tenant/onboarding");
         } else {
-          router.push("/dashboard");
+          router.push("/landlord/dashboard");
         }
       }}
       showStatusBar={true}
