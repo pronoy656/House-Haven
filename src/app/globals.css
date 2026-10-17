@@ -66,3 +66,32 @@ body {
   animation: confettiDrop 3s ease-in-out infinite;
 }
 
+/* Eliminate 300ms mobile touch delay */
+button, a, [role="button"], input, select, textarea {
+  touch-action: manipulation;
+}
+
+/* Hardware accelerated page fade-in */
+@keyframes pageFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: pageFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+/* Fast GPU-accelerated layer promotion */
+.gpu-layer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+

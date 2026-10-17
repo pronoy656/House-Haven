@@ -28,6 +28,8 @@ import {
   MapPin,
   CheckCircle2,
 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { TenantBottomNav } from "./TenantBottomNav";
 
 interface TenantSearchFlowScreenProps {
   onBackToDashboard?: () => void;
@@ -196,6 +198,8 @@ export function TenantSearchFlowScreen({
 
   // Card dragging & animation states
   const cardPointerStart = useRef<{ x: number; y: number } | null>(null);
+  const dragOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const cardRafId = useRef<number | null>(null);
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [cardAnimation, setCardAnimation] = useState<"none" | "exit-left" | "exit-right" | "exit-up">("none");
@@ -336,7 +340,14 @@ export function TenantSearchFlowScreen({
     if (!isDragging || !cardPointerStart.current || isAnimating) return;
     const diffX = e.clientX - cardPointerStart.current.x;
     const diffY = e.clientY - cardPointerStart.current.y;
-    setDragOffset({ x: diffX, y: diffY });
+    dragOffsetRef.current = { x: diffX, y: diffY };
+
+    if (!cardRafId.current) {
+      cardRafId.current = requestAnimationFrame(() => {
+        setDragOffset(dragOffsetRef.current);
+        cardRafId.current = null;
+      });
+    }
   };
 
   const handleCardPointerUp = (e: React.PointerEvent) => {
@@ -346,9 +357,13 @@ export function TenantSearchFlowScreen({
     } catch {
       // ignore
     }
+    if (cardRafId.current) {
+      cancelAnimationFrame(cardRafId.current);
+      cardRafId.current = null;
+    }
     setIsDragging(false);
 
-    const { x, y } = dragOffset;
+    const { x, y } = dragOffsetRef.current;
 
     // Swipe Up -> View details
     if (y < -50 && Math.abs(x) < 80) {
@@ -510,14 +525,16 @@ export function TenantSearchFlowScreen({
               </div>
 
               {/* Start AI Search Button */}
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                size="md"
+                fullWidth
                 onClick={() => setShowWarningModal(true)}
-                className="w-full mt-5 py-3.5 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-sm active:scale-[0.99] cursor-pointer"
+                className="mt-5 font-semibold text-sm"
+                rightIcon={<ArrowRight className="w-4 h-4 stroke-[2.2]" />}
               >
-                <span>Start AI Search</span>
-                <ArrowRight className="w-4 h-4 stroke-[2.2]" />
-              </button>
+                Start AI Search
+              </Button>
             </div>
           </div>
         </div>
@@ -922,26 +939,28 @@ export function TenantSearchFlowScreen({
                    ───────────────────────────────────────────────────────────── */}
                 <div className="flex items-center gap-3 pt-2">
                   {/* Pass Button */}
-                  <button
-                    type="button"
+                  <Button
+                    variant="danger"
+                    size="md"
                     disabled={isAnimating}
                     onClick={() => triggerPass()}
-                    className="flex-1 py-3.5 rounded-full border border-slate-200 text-slate-700 font-bold text-xs text-center hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all shadow-2xs cursor-pointer active:scale-95 flex items-center justify-center gap-2"
+                    className="flex-1 font-bold text-xs"
+                    leftIcon={<X className="w-4 h-4 stroke-[2.4]" />}
                   >
-                    <X className="w-4 h-4 stroke-[2.4]" />
-                    <span>Pass</span>
-                  </button>
+                    Pass
+                  </Button>
 
                   {/* Love Button */}
-                  <button
-                    type="button"
+                  <Button
+                    variant="primary"
+                    size="md"
                     disabled={isAnimating}
                     onClick={() => triggerLove()}
-                    className="flex-1 py-3.5 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer active:scale-95 hover:shadow-md"
+                    className="flex-1 font-bold text-xs shadow-sm hover:shadow-md"
+                    leftIcon={<Heart className="w-4 h-4 stroke-[2.4] fill-white" />}
                   >
-                    <Heart className="w-4 h-4 stroke-[2.4] fill-white" />
-                    <span>Love</span>
-                  </button>
+                    Love
+                  </Button>
                 </div>
               </div>
             </div>
@@ -1196,82 +1215,29 @@ export function TenantSearchFlowScreen({
       {/* ─────────────────────────────────────────────────────────────
           BOTTOM NAVIGATION BAR (Matching screenshot exactly)
          ───────────────────────────────────────────────────────────── */}
-      <div className="shrink-0 z-30 bg-white border-t border-slate-100 px-3 py-2 flex items-center justify-around shadow-sm">
-        {/* Dashboard Tab */}
-        <button
-          type="button"
-          onClick={() => {
-            setActiveTab("dashboard");
-            if (onBackToDashboard) onBackToDashboard();
-          }}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "dashboard" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <LayoutGrid className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Dashboard</span>
-        </button>
-
-        {/* Search Tab (Active) */}
-        <button
-          type="button"
-          onClick={() => {
-            setActiveTab("search");
-            setCurrentStep(1);
-          }}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "search" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <Search className="w-5 h-5 stroke-[2.2]" />
-          <span className="text-[10px] font-semibold">Search</span>
-        </button>
-
-        {/* Matches Tab */}
-        <button
-          type="button"
-          onClick={() => {
-            setActiveTab("matches");
-            if (onNavigateToMatches) onNavigateToMatches();
-          }}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "matches" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <Repeat2 className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Matches</span>
-        </button>
-
-        {/* Application Tab */}
-        <button
-          type="button"
-          onClick={() => {
-            setActiveTab("application");
-            if (onNavigateToApplications) onNavigateToApplications();
-          }}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "application" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <FileText className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Application</span>
-        </button>
-
-        {/* Profile Tab */}
-        <button
-          type="button"
-          onClick={() => {
-            setActiveTab("profile");
-            if (onNavigateToProfile) onNavigateToProfile();
-          }}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "profile" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <User className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Profile</span>
-        </button>
-      </div>
+      <TenantBottomNav
+        activeTab={activeTab === "application" ? "maintenance" : activeTab}
+        onNavigateToDashboard={() => {
+          setActiveTab("dashboard");
+          if (onBackToDashboard) onBackToDashboard();
+        }}
+        onNavigateToSearch={() => {
+          setActiveTab("search");
+          setCurrentStep(1);
+        }}
+        onNavigateToMatches={() => {
+          setActiveTab("matches");
+          if (onNavigateToMatches) onNavigateToMatches();
+        }}
+        onNavigateToMaintenance={() => {
+          setActiveTab("application");
+          if (onNavigateToApplications) onNavigateToApplications();
+        }}
+        onNavigateToProfile={() => {
+          setActiveTab("profile");
+          if (onNavigateToProfile) onNavigateToProfile();
+        }}
+      />
 
     </div>
   );

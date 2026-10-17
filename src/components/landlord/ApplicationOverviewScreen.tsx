@@ -1,17 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   ArrowLeft,
   Bell,
   Heart,
-  LayoutGrid,
-  Building,
-  FileText,
-  MessageSquareMore,
-  User,
 } from "lucide-react";
 import { MobileStatusBar } from "../MobileStatusBar";
+import { Button } from "@/components/ui/Button";
+import { LandlordBottomNav } from "./LandlordBottomNav";
 
 interface ApplicationOverviewScreenProps {
   onBack?: () => void;
@@ -105,75 +103,74 @@ export function ApplicationOverviewScreen({
 
       {/* Top Header - Fixed/Sticky */}
       <div className="px-5 pt-3 pb-2 flex items-center justify-between shrink-0 z-20 bg-white">
-        <button
-          type="button"
+        <Button
+          variant="icon"
+          size="icon-sm"
           onClick={onBack || onNavigateToDashboard}
-          className="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+          aria-label="Back"
         >
           <ArrowLeft className="w-4 h-4" />
-        </button>
+        </Button>
 
         <h1 className="text-[17px] font-bold text-slate-900">
           Application Overview
         </h1>
 
-        <button
-          type="button"
+        <Button
+          variant="icon"
+          size="icon-sm"
           onClick={onNavigateToNotifications}
+          prefetchHref="/landlord/notifications"
           title="Notifications"
-          className="w-9 h-9 rounded-full flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer relative"
+          className="relative"
         >
           <Bell className="w-5 h-5 stroke-[1.8]" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#0891A2] rounded-full ring-2 ring-white" />
-        </button>
+        </Button>
       </div>
 
       {/* Filter Tabs - Fixed/Sticky */}
       <div className="px-5 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0 z-20 bg-white border-b border-slate-50">
-        <button
+        <Button
           type="button"
+          variant="pill"
+          size="xs"
+          isActive={filter === "all"}
           onClick={() => setFilter("all")}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-            filter === "all"
-              ? "bg-[#0891A2] text-white shadow-xs"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-          }`}
+          className="px-3.5 py-1.5"
         >
           All(12)
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="pill"
+          size="xs"
+          isActive={filter === "pending"}
           onClick={() => setFilter("pending")}
-          className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
-            filter === "pending"
-              ? "bg-[#0891A2] text-white shadow-xs"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-          }`}
+          className="px-3.5 py-1.5"
         >
           Pending (8)
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="pill"
+          size="xs"
+          isActive={filter === "approved"}
           onClick={() => setFilter("approved")}
-          className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
-            filter === "approved"
-              ? "bg-[#0891A2] text-white shadow-xs"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-          }`}
+          className="px-3.5 py-1.5"
         >
           Approved (4)
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="pill"
+          size="xs"
+          isActive={filter === "rejected"}
           onClick={() => setFilter("rejected")}
-          className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
-            filter === "rejected"
-              ? "bg-[#0891A2] text-white shadow-xs"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-          }`}
+          className="px-3.5 py-1.5"
         >
           Rejected
-        </button>
+        </Button>
       </div>
 
       {/* Main Scrollable Content */}
@@ -187,13 +184,15 @@ export function ApplicationOverviewScreen({
               className="p-3.5 bg-white border border-slate-100/90 hover:border-slate-200 hover:shadow-xs rounded-2xl flex items-center justify-between transition-all shadow-2xs group cursor-pointer"
             >
               <div className="flex items-center gap-3.5 min-w-0">
-                {/* Applicant Photo */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-16 h-16 rounded-2xl object-cover shrink-0 ring-1 ring-slate-100"
-                />
+                <div className="w-16 h-16 rounded-2xl overflow-hidden relative shrink-0 ring-1 ring-slate-100">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                  />
+                </div>
 
                 <div className="min-w-0">
                   <h3 className="text-[14.5px] font-bold text-slate-900 leading-tight">
@@ -240,51 +239,14 @@ export function ApplicationOverviewScreen({
       </div>
 
       {/* Bottom Navigation Bar */}
-      <nav className="h-16 bg-white border-t border-slate-100 px-3 flex items-center justify-around shrink-0 shadow-xs z-20">
-        <button
-          type="button"
-          onClick={onNavigateToDashboard}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <LayoutGrid className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Dashboard</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToProperties}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <Building className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Properties</span>
-        </button>
-
-        <button
-          type="button"
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-[#0891A2] font-semibold transition-all cursor-pointer"
-        >
-          <FileText className="w-5 h-5 stroke-[2.2]" />
-          <span className="text-[10px] leading-none">Applications</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToMessages}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <MessageSquareMore className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Messages</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToProfile}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <User className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Profile</span>
-        </button>
-      </nav>
+      <LandlordBottomNav
+        activeTab="applications"
+        onNavigateToDashboard={onNavigateToDashboard}
+        onNavigateToProperties={onNavigateToProperties}
+        onNavigateToApplications={() => {}}
+        onNavigateToMessages={onNavigateToMessages}
+        onNavigateToProfile={onNavigateToProfile}
+      />
     </div>
   );
 }

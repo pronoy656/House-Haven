@@ -12,13 +12,10 @@ import {
   MapPin,
   ShieldCheck,
   MailCheck,
-  LayoutGrid,
-  Search,
-  Repeat2,
-  FileText,
-  User,
   CheckCircle2,
 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { TenantBottomNav } from "./TenantBottomNav";
 
 interface TenantLandlordProfileScreenProps {
   onBack?: () => void;
@@ -94,7 +91,6 @@ export function TenantLandlordProfileScreen({
 }: TenantLandlordProfileScreenProps) {
   // Current view: "profile" = Landlord Profile, "reviews" = John Wick Reviews
   const [currentView, setCurrentView] = useState<"profile" | "reviews">(initialView);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "search" | "matches" | "application" | "profile">("profile");
 
   return (
     <div className="relative w-full h-full max-h-[100dvh] bg-[#F8FAFC] flex flex-col justify-between text-slate-900 overflow-hidden select-none">
@@ -118,14 +114,15 @@ export function TenantLandlordProfileScreen({
             <div className="absolute inset-0 bg-black/15 pointer-events-none" />
 
             {/* Floating Back Button */}
-            <button
-              type="button"
+            <Button
+              variant="icon"
+              size="icon-sm"
               onClick={onBack}
-              className="absolute top-4 left-4 w-9 h-9 rounded-full bg-white/80 hover:bg-white backdrop-blur-md flex items-center justify-center text-slate-800 shadow-sm transition-all cursor-pointer z-20"
+              className="absolute top-4 left-4 bg-white/80 hover:bg-white backdrop-blur-md z-20 shadow-sm"
               title="Back"
             >
               <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
-            </button>
+            </Button>
           </div>
 
           {/* Landlord Info Body */}
@@ -254,14 +251,14 @@ export function TenantLandlordProfileScreen({
 
           {/* Top Bar with Back Button */}
           <div className="shrink-0 px-5 pt-4 pb-2 flex items-center justify-between">
-            <button
-              type="button"
+            <Button
+              variant="icon"
+              size="icon-sm"
               onClick={() => setCurrentView("profile")}
-              className="w-9 h-9 rounded-full bg-white shadow-2xs border border-slate-100 flex items-center justify-center text-slate-800 hover:bg-slate-50 transition-colors cursor-pointer"
               title="Back to Landlord Profile"
             >
               <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
-            </button>
+            </Button>
 
             <h1 className="text-[17px] font-bold text-slate-900 tracking-tight">
               John Wick Reviews
@@ -332,11 +329,12 @@ export function TenantLandlordProfileScreen({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 relative shrink-0">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
+                          <Image
                             src={rev.avatar}
                             alt={rev.name}
-                            className="w-full h-full object-cover"
+                            fill
+                            sizes="36px"
+                            className="object-cover"
                           />
                         </div>
                         <h3 className="text-[13px] font-bold text-slate-900 leading-tight">
@@ -366,69 +364,15 @@ export function TenantLandlordProfileScreen({
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          BOTTOM NAVIGATION BAR (Matching screenshot exactly)
+          BOTTOM NAVIGATION BAR (Standardized reusable component)
          ───────────────────────────────────────────────────────────── */}
-      <div className="shrink-0 z-30 bg-white border-t border-slate-100 px-3 py-2 flex items-center justify-around shadow-sm">
-        {/* Dashboard Tab */}
-        <button
-          type="button"
-          onClick={onNavigateToDashboard}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "dashboard" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <LayoutGrid className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Dashboard</span>
-        </button>
-
-        {/* Search Tab */}
-        <button
-          type="button"
-          onClick={onNavigateToSearch}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "search" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <Search className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Search</span>
-        </button>
-
-        {/* Matches Tab */}
-        <button
-          type="button"
-          onClick={onNavigateToMatches}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "matches" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <Repeat2 className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Matches</span>
-        </button>
-
-        {/* Application Tab */}
-        <button
-          type="button"
-          onClick={onNavigateToApplications}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "application" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <FileText className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Application</span>
-        </button>
-
-        {/* Profile Tab (Active) */}
-        <button
-          type="button"
-          onClick={() => setActiveTab("profile")}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "profile" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <User className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-semibold">Profile</span>
-        </button>
-      </div>
+      <TenantBottomNav
+        activeTab="profile"
+        onNavigateToDashboard={onNavigateToDashboard}
+        onNavigateToSearch={onNavigateToSearch}
+        onNavigateToMatches={onNavigateToMatches}
+        onNavigateToProfile={() => setCurrentView("profile")}
+      />
 
     </div>
   );

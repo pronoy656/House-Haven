@@ -151,7 +151,7 @@ export function RoleSelectionScreen({
           variant="primary"
           onClick={handleContinue}
           isLoading={isSubmitting}
-          className="h-12 font-semibold text-sm border-0 shadow-none outline-none"
+          className="h-12 font-semibold text-sm border-0 shadow-none outline-none w-full"
         >
           Continue
         </Button>

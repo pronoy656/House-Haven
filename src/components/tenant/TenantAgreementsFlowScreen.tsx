@@ -12,11 +12,6 @@ import {
   RotateCcw,
   FileText,
   Upload,
-  LayoutGrid,
-  Search,
-  Repeat2,
-  Wrench,
-  User,
   Check,
   Star,
   X,
@@ -24,6 +19,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { TenantBottomNav } from "./TenantBottomNav";
 
 interface AgreementItem {
   id: string;
@@ -89,9 +86,6 @@ export function TenantAgreementsFlowScreen() {
   
   // Tab filter in Agreements list: "all" | "pending" | "signed"
   const [filterTab, setFilterTab] = useState<"all" | "pending" | "signed">("all");
-  
-  // Bottom navigation tab
-  const [bottomNavTab, setBottomNavTab] = useState<"dashboard" | "search" | "matches" | "maintenance" | "profile">("dashboard");
 
   // Agreements state
   const [agreements, setAgreements] = useState<AgreementItem[]>(INITIAL_AGREEMENTS);
@@ -274,24 +268,8 @@ export function TenantAgreementsFlowScreen() {
         </div>
       )}
 
-      {/* TOP SYSTEM STATUS BAR (Consistent 19:27) */}
-      <div className="shrink-0 pt-2.5 px-6 flex items-center justify-between text-slate-800 text-[13px] font-semibold tracking-tight z-20">
-        <span>19:27</span>
-        <div className="flex items-center gap-1.5">
-          <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-            <path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L12 22l7.03-4.39C20.26 16.07 21 14.12 21 12c0-4.97-4.03-9-9-9z" />
-          </svg>
-          <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-            <path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4z" />
-          </svg>
-          <div className="w-5 h-2.5 border border-slate-700 rounded-xs p-0.5 flex items-center">
-            <div className="w-full h-full bg-slate-800 rounded-2xs" />
-          </div>
-        </div>
-      </div>
-
       {/* MAIN STEP CONTAINER */}
-      <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col relative">
+      <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col relative pt-1">
 
         {/* ============================================================== */}
         {/* SCREEN 1: AGREEMENTS LIST                                     */}
@@ -300,63 +278,60 @@ export function TenantAgreementsFlowScreen() {
           <div className="p-4 pb-6 flex flex-col flex-1 animate-in fade-in duration-200">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-              <button
-                type="button"
+              <Button
+                variant="icon"
+                size="icon-sm"
                 onClick={() => router.push("/tenant/dashboard")}
-                className="w-9 h-9 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors shadow-2xs active:scale-95 cursor-pointer"
+                prefetchHref="/tenant/dashboard"
               >
                 <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
-              </button>
+              </Button>
 
               <h1 className="text-[17px] font-bold text-slate-900 tracking-tight">
                 Agreements
               </h1>
 
-              <button
-                type="button"
+              <Button
+                variant="icon"
+                size="icon-sm"
                 onClick={() => router.push("/tenant/notifications")}
-                className="w-9 h-9 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors shadow-2xs relative active:scale-95 cursor-pointer"
+                prefetchHref="/tenant/notifications"
+                className="relative"
               >
                 <Bell className="w-4 h-4 stroke-[2]" />
                 <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#0891A2] rounded-full" />
-              </button>
+              </Button>
             </div>
 
             {/* Filter Tabs: All, Pending, Signed */}
             <div className="flex items-center gap-2 mb-4">
-              <button
+              <Button
                 type="button"
+                variant="pill"
+                size="sm"
+                isActive={filterTab === "all"}
                 onClick={() => setFilterTab("all")}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                  filterTab === "all"
-                    ? "bg-[#0891A2] text-white shadow-xs"
-                    : "bg-[#F1F5F9] text-slate-600 hover:bg-slate-200"
-                }`}
               >
                 All({agreements.length})
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="pill"
+                size="sm"
+                isActive={filterTab === "pending"}
                 onClick={() => setFilterTab("pending")}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                  filterTab === "pending"
-                    ? "bg-[#0891A2] text-white shadow-xs"
-                    : "bg-[#F1F5F9] text-slate-600 hover:bg-slate-200"
-                }`}
               >
                 Pending({pendingCount})
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="pill"
+                size="sm"
+                isActive={filterTab === "signed"}
                 onClick={() => setFilterTab("signed")}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                  filterTab === "signed"
-                    ? "bg-[#0891A2] text-white shadow-xs"
-                    : "bg-[#F1F5F9] text-slate-600 hover:bg-slate-200"
-                }`}
               >
                 Signed({signedCount})
-              </button>
+              </Button>
             </div>
 
             {/* Agreements Cards List */}
@@ -437,26 +412,28 @@ export function TenantAgreementsFlowScreen() {
           <div className="p-4 pb-6 flex flex-col flex-1 animate-in fade-in duration-200">
             {/* Header */}
             <div className="flex items-center justify-between mb-3.5">
-              <button
-                type="button"
+              <Button
+                variant="icon"
+                size="icon-sm"
                 onClick={() => setCurrentStep("list")}
-                className="w-9 h-9 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors shadow-2xs active:scale-95 cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
-              </button>
+              </Button>
 
               <h1 className="text-[16.5px] font-bold text-slate-900 tracking-tight">
                 Agreements Details
               </h1>
 
-              <button
-                type="button"
+              <Button
+                variant="icon"
+                size="icon-sm"
                 onClick={() => router.push("/tenant/notifications")}
-                className="w-9 h-9 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors shadow-2xs relative active:scale-95 cursor-pointer"
+                prefetchHref="/tenant/notifications"
+                className="relative"
               >
                 <Bell className="w-4 h-4 stroke-[2]" />
                 <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#0891A2] rounded-full" />
-              </button>
+              </Button>
             </div>
 
             {/* Ultra High Quality Hero Property Interior Image */}
@@ -599,25 +576,29 @@ export function TenantAgreementsFlowScreen() {
                       placeholder="Type a message..."
                       className="flex-1 bg-slate-50 border border-slate-200/80 rounded-full px-3 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0891A2]"
                     />
-                    <button
+                    <Button
                       type="button"
+                      variant="primary"
+                      size="icon-xs"
                       onClick={handleSendMessage}
-                      className="w-7 h-7 rounded-full bg-[#0891A2] text-white flex items-center justify-center hover:bg-[#078090] transition-colors shrink-0 active:scale-95 cursor-pointer shadow-xs"
+                      className="w-7 h-7 shrink-0 shadow-xs"
                     >
                       <Send className="w-3.5 h-3.5" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
                 {/* ONLY Review & Sign Button (Download a Copy removed per request) */}
                 <div className="mt-auto pt-2">
-                  <button
+                  <Button
                     type="button"
+                    variant="primary"
+                    size="lg"
+                    fullWidth
                     onClick={() => setCurrentStep("review")}
-                    className="w-full py-3.5 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-semibold text-xs transition-all shadow-xs cursor-pointer active:scale-[0.99] text-center"
                   >
                     Review & Sign
-                  </button>
+                  </Button>
                 </div>
               </>
             )}
@@ -677,13 +658,15 @@ export function TenantAgreementsFlowScreen() {
 
                 {/* ONLY View Agreement Button (Download a Copy removed) */}
                 <div className="mt-auto pt-2">
-                  <button
+                  <Button
                     type="button"
+                    variant="primary"
+                    size="lg"
+                    fullWidth
                     onClick={() => setIsViewAgreementDocOpen(true)}
-                    className="w-full py-3.5 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-semibold text-xs transition-all shadow-xs cursor-pointer active:scale-[0.99] text-center"
                   >
                     View Agreement
-                  </button>
+                  </Button>
                 </div>
               </>
             )}
@@ -743,13 +726,15 @@ export function TenantAgreementsFlowScreen() {
 
                 {/* ONLY Give Landlord Review Button (Download a Copy removed) */}
                 <div className="mt-auto pt-2">
-                  <button
+                  <Button
                     type="button"
+                    variant="primary"
+                    size="lg"
+                    fullWidth
                     onClick={() => setIsReviewModalOpen(true)}
-                    className="w-full py-3.5 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-semibold text-xs transition-all shadow-xs cursor-pointer active:scale-[0.99] text-center"
                   >
                     Give Landlord Review
-                  </button>
+                  </Button>
                 </div>
               </>
             )}
@@ -764,26 +749,28 @@ export function TenantAgreementsFlowScreen() {
           <div className="p-4 pb-6 flex flex-col flex-1 animate-in fade-in duration-200">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-              <button
-                type="button"
+              <Button
+                variant="icon"
+                size="icon-sm"
                 onClick={() => setCurrentStep("details")}
-                className="w-9 h-9 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors shadow-2xs active:scale-95 cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
-              </button>
+              </Button>
 
               <h1 className="text-[16.5px] font-bold text-slate-900 tracking-tight">
                 Agreements Review
               </h1>
 
-              <button
-                type="button"
+              <Button
+                variant="icon"
+                size="icon-sm"
                 onClick={() => router.push("/tenant/notifications")}
-                className="w-9 h-9 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors shadow-2xs relative active:scale-95 cursor-pointer"
+                prefetchHref="/tenant/notifications"
+                className="relative"
               >
                 <Bell className="w-4 h-4 stroke-[2]" />
                 <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#0891A2] rounded-full" />
-              </button>
+              </Button>
             </div>
 
             {/* Document Card (Credit_Report.pdf) */}
@@ -806,39 +793,36 @@ export function TenantAgreementsFlowScreen() {
             {/* Signature Section */}
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-3">
-                <button
+                <Button
                   type="button"
+                  variant="pill"
+                  size="sm"
+                  isActive={signMethod === "draw"}
                   onClick={() => setSignMethod("draw")}
-                  className={`px-5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                    signMethod === "draw"
-                      ? "bg-[#0891A2] text-white shadow-xs"
-                      : "bg-[#F1F5F9] text-slate-600 hover:bg-slate-200"
-                  }`}
+                  className="px-5 py-1.5"
                 >
                   Draw
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="pill"
+                  size="sm"
+                  isActive={signMethod === "type"}
                   onClick={() => setSignMethod("type")}
-                  className={`px-5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                    signMethod === "type"
-                      ? "bg-[#0891A2] text-white shadow-xs"
-                      : "bg-[#F1F5F9] text-slate-600 hover:bg-slate-200"
-                  }`}
+                  className="px-5 py-1.5"
                 >
                   Type
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="pill"
+                  size="sm"
+                  isActive={signMethod === "upload"}
                   onClick={() => setSignMethod("upload")}
-                  className={`px-5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                    signMethod === "upload"
-                      ? "bg-[#0891A2] text-white shadow-xs"
-                      : "bg-[#F1F5F9] text-slate-600 hover:bg-slate-200"
-                  }`}
+                  className="px-5 py-1.5"
                 >
                   Upload
-                </button>
+                </Button>
               </div>
 
               {/* Signature Canvas Area */}
@@ -1020,11 +1004,14 @@ export function TenantAgreementsFlowScreen() {
 
             {/* Submit Action */}
             <div className="mt-auto">
-              <button
+              <Button
                 type="button"
+                variant="primary"
+                size="lg"
+                fullWidth
                 disabled={isSubmitting}
                 onClick={handleSignSubmit}
-                className="w-full py-3.5 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-semibold text-xs transition-all shadow-xs cursor-pointer active:scale-[0.99] flex items-center justify-center gap-2"
+                className="flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-2">
@@ -1034,7 +1021,7 @@ export function TenantAgreementsFlowScreen() {
                 ) : (
                   <span>Sign & Submit</span>
                 )}
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -1096,8 +1083,11 @@ export function TenantAgreementsFlowScreen() {
 
             {/* Action Buttons */}
             <div className="w-full space-y-2 mt-auto pt-6 relative z-10">
-              <button
+              <Button
                 type="button"
+                variant="primary"
+                size="lg"
+                fullWidth
                 onClick={() => {
                   setSelectedAgreement({
                     id: "1",
@@ -1109,21 +1099,22 @@ export function TenantAgreementsFlowScreen() {
                   });
                   setCurrentStep("details");
                 }}
-                className="w-full py-3.5 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-semibold text-xs transition-all shadow-xs cursor-pointer active:scale-[0.99] text-center"
               >
                 View Agreement
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="button"
+                variant="secondary"
+                size="lg"
+                fullWidth
                 onClick={() => {
                   setFilterTab("all");
                   setCurrentStep("list");
                 }}
-                className="w-full py-3 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs transition-all cursor-pointer active:scale-[0.99] text-center"
               >
                 Back to Agreements
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -1134,13 +1125,14 @@ export function TenantAgreementsFlowScreen() {
         {isReviewModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
             <div className="bg-white rounded-3xl p-6 w-full max-w-[310px] shadow-2xl border border-slate-100 flex flex-col items-center animate-in zoom-in-95 duration-200 relative">
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="icon-xs"
                 onClick={() => setIsReviewModalOpen(false)}
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
               >
                 <X className="w-4 h-4" />
-              </button>
+              </Button>
 
               <h3 className="text-base font-bold text-slate-900 mb-4 tracking-tight">
                 Review
@@ -1183,18 +1175,20 @@ export function TenantAgreementsFlowScreen() {
                 />
               </div>
 
-              <button
+              <Button
                 type="button"
+                variant="primary"
+                size="lg"
+                fullWidth
                 disabled={isSubmittingReview}
                 onClick={handleReviewSubmit}
-                className="w-full py-3 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-semibold text-xs transition-all shadow-xs cursor-pointer active:scale-[0.99] flex items-center justify-center gap-1.5"
               >
                 {isSubmittingReview ? (
                   <span>Submitting...</span>
                 ) : (
                   <span>Review</span>
                 )}
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -1215,13 +1209,14 @@ export function TenantAgreementsFlowScreen() {
                     <p className="text-[10px] text-slate-400">Riverside Apartments #123</p>
                   </div>
                 </div>
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
+                  size="icon-xs"
                   onClick={() => setIsViewAgreementDocOpen(false)}
-                  className="text-slate-400 hover:text-slate-600 cursor-pointer p-1"
+                  className="text-slate-400 hover:text-slate-600 p-1"
                 >
                   <X className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
 
               <div className="py-4 space-y-3">
@@ -1253,24 +1248,28 @@ export function TenantAgreementsFlowScreen() {
               </div>
 
               <div className="space-y-2 pt-1">
-                <button
+                <Button
                   type="button"
+                  variant="primary"
+                  size="md"
+                  fullWidth
                   onClick={() => {
                     setIsViewAgreementDocOpen(false);
                     showToast("Downloading Lease_Agreement_Signed.pdf...");
                   }}
-                  className="w-full py-2.5 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-semibold text-xs transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                  leftIcon={<Check className="w-3.5 h-3.5" />}
                 >
-                  <Check className="w-3.5 h-3.5" />
-                  <span>Download Signed PDF</span>
-                </button>
-                <button
+                  Download Signed PDF
+                </Button>
+                <Button
                   type="button"
+                  variant="secondary"
+                  size="sm"
+                  fullWidth
                   onClick={() => setIsViewAgreementDocOpen(false)}
-                  className="w-full py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs transition-colors cursor-pointer text-center"
                 >
                   Close
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -1279,84 +1278,9 @@ export function TenantAgreementsFlowScreen() {
       </div>
 
       {/* ============================================================== */}
-      {/* 5. BOTTOM NAVIGATION BAR                                       */}
+      {/* 5. BOTTOM NAVIGATION BAR (Standardized reusable component)     */}
       {/* ============================================================== */}
-      <div className="shrink-0 z-30 bg-white border-t border-slate-100 px-3 py-2 flex items-center justify-around shadow-sm">
-        {/* Dashboard Tab */}
-        <button
-          type="button"
-          onClick={() => {
-            setBottomNavTab("dashboard");
-            router.push("/tenant/dashboard");
-          }}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            bottomNavTab === "dashboard" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <LayoutGrid className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-semibold">Dashboard</span>
-        </button>
-
-        {/* Search Tab */}
-        <button
-          type="button"
-          onClick={() => {
-            setBottomNavTab("search");
-            router.push("/tenant/search");
-          }}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            bottomNavTab === "search" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <Search className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Search</span>
-        </button>
-
-        {/* Matches Tab */}
-        <button
-          type="button"
-          onClick={() => {
-            setBottomNavTab("matches");
-            router.push("/tenant/matches");
-          }}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            bottomNavTab === "matches" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <Repeat2 className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Matches</span>
-        </button>
-
-        {/* Maintenance Tab */}
-        <button
-          type="button"
-          onClick={() => {
-            setBottomNavTab("maintenance");
-            router.push("/tenant/maintenance");
-          }}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            bottomNavTab === "maintenance" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <Wrench className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Maintenance</span>
-        </button>
-
-        {/* Profile Tab */}
-        <button
-          type="button"
-          onClick={() => {
-            setBottomNavTab("profile");
-            router.push("/tenant/profile");
-          }}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            bottomNavTab === "profile" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <User className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Profile</span>
-        </button>
-      </div>
+      <TenantBottomNav activeTab="dashboard" />
 
     </div>
   );

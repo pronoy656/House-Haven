@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   ArrowLeft,
   Bell,
@@ -22,15 +23,11 @@ import {
   Info,
   X,
   CheckCircle2,
-  LayoutGrid,
-  Building,
-  FileText,
-  MessageSquareMore,
-  User,
   LogOut,
 } from "lucide-react";
 import { MobileStatusBar } from "../MobileStatusBar";
 import { Button } from "../ui/Button";
+import { LandlordBottomNav } from "./LandlordBottomNav";
 
 export type ProfileFlowView =
   | "profile"
@@ -208,12 +205,13 @@ export function LandlordProfileFlowScreen({
             {/* Avatar Row */}
             <div className="flex justify-center pt-1">
               <div className="relative">
-                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white shadow-md bg-slate-100">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white shadow-md bg-slate-100 relative">
+                  <Image
                     src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=240&q=80"
                     alt="Andy Lexian"
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="80px"
+                    className="object-cover"
                   />
                 </div>
                 <button
@@ -502,12 +500,13 @@ export function LandlordProfileFlowScreen({
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full overflow-hidden bg-slate-200 shrink-0">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                      <div className="w-7 h-7 rounded-full overflow-hidden bg-slate-200 shrink-0 relative">
+                        <Image
                           src={rev.avatar}
                           alt={rev.name}
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="28px"
+                          className="object-cover"
                         />
                       </div>
                       <span className="text-xs font-bold text-slate-800">{rev.name}</span>
@@ -943,77 +942,45 @@ export function LandlordProfileFlowScreen({
             {/* Modal Actions: Log Out ON TOP, Cancel ON BOTTOM */}
             <div className="space-y-2 pt-1">
               {/* TOP: Log Out Button */}
-              <button
+              <Button
                 type="button"
+                variant="danger"
+                size="md"
+                fullWidth
                 onClick={() => {
                   setShowLogoutModal(false);
                   onLogout?.();
                 }}
-                className="w-full h-10 rounded-2xl bg-rose-500 hover:bg-rose-600 active:scale-98 text-white font-semibold text-xs transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
+                className="h-10 rounded-2xl"
               >
-                <span>Log Out</span>
-              </button>
+                Log Out
+              </Button>
 
               {/* BOTTOM: Cancel Button */}
-              <button
+              <Button
                 type="button"
+                variant="secondary"
+                size="md"
+                fullWidth
                 onClick={() => setShowLogoutModal(false)}
-                className="w-full h-10 rounded-2xl bg-slate-100 hover:bg-slate-200/80 active:scale-98 text-slate-700 font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center"
+                className="h-10 rounded-2xl"
               >
-                <span>Cancel</span>
-              </button>
+                Cancel
+              </Button>
             </div>
           </div>
         </div>
       )}
 
       {/* Bottom Navigation Bar */}
-      <nav className="h-16 bg-white border-t border-slate-100 px-3 flex items-center justify-around shrink-0 shadow-xs z-20">
-        <button
-          type="button"
-          onClick={onNavigateToDashboard}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <LayoutGrid className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Dashboard</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToProperties}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <Building className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Properties</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToApplications}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <FileText className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Applications</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToMessages}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <MessageSquareMore className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Messages</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setCurrentView("setting")}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-[#0891A2] font-semibold transition-all cursor-pointer"
-        >
-          <User className="w-5 h-5 stroke-[2.2]" />
-          <span className="text-[10px] leading-none">Profile</span>
-        </button>
-      </nav>
+      <LandlordBottomNav
+        activeTab="profile"
+        onNavigateToDashboard={onNavigateToDashboard}
+        onNavigateToProperties={onNavigateToProperties}
+        onNavigateToApplications={onNavigateToApplications}
+        onNavigateToMessages={onNavigateToMessages}
+        onNavigateToProfile={() => setCurrentView("setting")}
+      />
     </div>
   );
 }

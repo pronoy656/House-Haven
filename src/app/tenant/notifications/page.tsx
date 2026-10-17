@@ -39,24 +39,8 @@ export default function TenantNotificationsPage() {
     <MobileContainer>
       <div className="relative w-full h-full max-h-[100dvh] bg-[#F8FAFC] flex flex-col justify-between text-slate-900 overflow-hidden select-none font-sans">
         
-        {/* Status Bar */}
-        <div className="shrink-0 pt-2.5 px-6 flex items-center justify-between text-slate-800 text-[13px] font-semibold tracking-tight z-20">
-          <span>19:27</span>
-          <div className="flex items-center gap-1.5">
-            <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-              <path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L12 22l7.03-4.39C20.26 16.07 21 14.12 21 12c0-4.97-4.03-9-9-9z" />
-            </svg>
-            <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-              <path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4z" />
-            </svg>
-            <div className="w-5 h-2.5 border border-slate-700 rounded-xs p-0.5 flex items-center">
-              <div className="w-full h-full bg-slate-800 rounded-2xs" />
-            </div>
-          </div>
-        </div>
-
         {/* Content */}
-        <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-4 pb-6 space-y-4">
+        <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-4 pt-5 pb-6 space-y-4">
           <div className="flex items-center justify-between">
             <button
               type="button"

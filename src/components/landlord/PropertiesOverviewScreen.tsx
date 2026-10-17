@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   ArrowLeft,
   Bell,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 import { MobileStatusBar } from "../MobileStatusBar";
 import { Button } from "../ui/Button";
+import { LandlordBottomNav } from "./LandlordBottomNav";
 
 interface PropertiesOverviewScreenProps {
   onBack?: () => void;
@@ -251,12 +253,15 @@ export function PropertiesOverviewScreen({
                 className="p-3 bg-[#F8FAFC] hover:bg-slate-100/70 border border-slate-100 rounded-2xl flex items-center justify-between cursor-pointer transition-all shadow-2xs group"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-16 h-16 rounded-xl object-cover shrink-0"
-                  />
+                  <div className="w-16 h-16 rounded-xl overflow-hidden relative shrink-0">
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                    />
+                  </div>
                   <div className="min-w-0">
                     <h3 className="text-[13.5px] font-bold text-slate-900 leading-tight truncate group-hover:text-[#0891A2] transition-colors">
                       {item.title}
@@ -294,51 +299,14 @@ export function PropertiesOverviewScreen({
       </div>
 
       {/* Bottom Navigation Bar */}
-      <nav className="h-16 bg-white border-t border-slate-100 px-3 flex items-center justify-around shrink-0 shadow-xs z-20">
-        <button
-          type="button"
-          onClick={onNavigateToDashboard}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <LayoutGrid className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Dashboard</span>
-        </button>
-
-        <button
-          type="button"
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-[#0891A2] font-semibold transition-all cursor-pointer"
-        >
-          <Building className="w-5 h-5 stroke-[2.2]" />
-          <span className="text-[10px] leading-none">Properties</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToApplications}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <FileText className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Applications</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToMessages}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <MessageSquareMore className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Messages</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToProfile}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <User className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Profile</span>
-        </button>
-      </nav>
+      <LandlordBottomNav
+        activeTab="properties"
+        onNavigateToDashboard={onNavigateToDashboard}
+        onNavigateToProperties={() => {}}
+        onNavigateToApplications={onNavigateToApplications}
+        onNavigateToMessages={onNavigateToMessages}
+        onNavigateToProfile={onNavigateToProfile}
+      />
     </div>
   );
 }

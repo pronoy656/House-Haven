@@ -14,14 +14,10 @@ import {
   ChevronRight,
   UploadCloud,
   X,
-  LayoutGrid,
-  Building,
-  FileText,
-  MessageSquareMore,
-  User,
 } from "lucide-react";
 import { MobileStatusBar } from "../MobileStatusBar";
 import { Button } from "../ui/Button";
+import { LandlordBottomNav } from "./LandlordBottomNav";
 
 export type IssueFlowView =
   | "details_open"
@@ -101,13 +97,14 @@ export function IssueDetailsFlowScreen({
 
       {/* Top Header - Fixed/Sticky */}
       <div className="px-5 pt-3 pb-2 flex items-center justify-between shrink-0 z-20 bg-white border-b border-slate-50">
-        <button
-          type="button"
+        <Button
+          variant="secondary"
+          size="icon-sm"
           onClick={handleBack}
-          className="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+          aria-label="Back"
         >
           <ArrowLeft className="w-4 h-4" />
-        </button>
+        </Button>
 
         <h1 className="text-[17px] font-bold text-slate-900">
           {currentView === "schedule_appointment"
@@ -117,12 +114,13 @@ export function IssueDetailsFlowScreen({
             : "Issue Details"}
         </h1>
 
-        <button
-          type="button"
-          className="w-9 h-9 rounded-full flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+        <Button
+          variant="icon"
+          size="icon-sm"
+          aria-label="Notifications"
         >
           <Bell className="w-5 h-5 stroke-[1.8]" />
-        </button>
+        </Button>
       </div>
 
       {/* Scrollable Content */}
@@ -170,11 +168,12 @@ export function IssueDetailsFlowScreen({
                       : "border-slate-100 opacity-75 hover:opacity-100"
                   }`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={thumb}
                     alt={`Thumb ${idx + 1}`}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="60px"
+                    className="object-cover"
                   />
                 </button>
               ))}
@@ -210,12 +209,13 @@ export function IssueDetailsFlowScreen({
                 </div>
                 <span className="text-slate-400 w-16">Report by</span>
                 <div className="flex items-center gap-1.5 flex-1">
-                  <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-200 shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                  <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-200 shrink-0 relative">
+                    <Image
                       src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80"
                       alt="Jerome Bell"
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="20px"
+                      className="object-cover"
                     />
                   </div>
                   <span className="font-semibold text-slate-800">
@@ -282,13 +282,13 @@ export function IssueDetailsFlowScreen({
                 >
                   Update Status
                 </Button>
-                <button
-                  type="button"
+                <Button
+                  variant="outline"
                   onClick={() => setCurrentView("quote_admin")}
-                  className="h-11 font-semibold text-xs w-full rounded-2xl border border-slate-200 bg-white text-slate-800 hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="w-full"
                 >
                   Request a Quote
-                </button>
+                </Button>
               </div>
             )}
 
@@ -367,13 +367,13 @@ export function IssueDetailsFlowScreen({
                 ========================================================================= */}
             {currentView === "details_in_progress" && (
               <div className="grid grid-cols-2 gap-2 pt-2 pb-1">
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
                   onClick={() => setCurrentView("schedule_appointment")}
-                  className="h-11 font-semibold text-xs rounded-2xl bg-[#E0F2FE] hover:bg-[#BAE6FD] text-[#0284C7] transition-colors cursor-pointer"
+                  className="bg-[#E0F2FE] hover:bg-[#BAE6FD] text-[#0284C7] border-0"
                 >
                   Reschedule
-                </button>
+                </Button>
                 <Button
                   variant="primary"
                   onClick={() => setCurrentView("make_completed")}
@@ -393,12 +393,15 @@ export function IssueDetailsFlowScreen({
           <div className="space-y-4 pt-1">
             {/* Top Issue Summary Card */}
             <div className="p-3 bg-[#F8FAFC] border border-slate-100 rounded-2xl flex items-center gap-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=200&q=80"
-                alt="Faucet"
-                className="w-12 h-12 rounded-xl object-cover shrink-0"
-              />
+              <div className="w-12 h-12 rounded-xl overflow-hidden relative shrink-0">
+                <Image
+                  src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=200&q=80"
+                  alt="Faucet"
+                  fill
+                  sizes="48px"
+                  className="object-cover"
+                />
+              </div>
               <div className="min-w-0">
                 <h4 className="text-[13.5px] font-bold text-slate-900 leading-tight">
                   Leaking Faucet
@@ -420,19 +423,23 @@ export function IssueDetailsFlowScreen({
 
               {/* Month Navigator */}
               <div className="flex items-center justify-between text-xs font-semibold text-slate-800 px-2">
-                <button
-                  type="button"
-                  className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-slate-100 text-slate-600"
+                <Button
+                  variant="icon"
+                  size="icon-xs"
+                  aria-label="Previous month"
+                  className="text-slate-600"
                 >
                   <ChevronLeft className="w-4 h-4" />
-                </button>
+                </Button>
                 <span>March 2025</span>
-                <button
-                  type="button"
-                  className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-slate-100 text-slate-600"
+                <Button
+                  variant="icon"
+                  size="icon-xs"
+                  aria-label="Next month"
+                  className="text-slate-600"
                 >
                   <ChevronRight className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
 
               {/* Calendar Grid */}
@@ -530,12 +537,15 @@ export function IssueDetailsFlowScreen({
           <div className="space-y-4 pt-1">
             {/* Top Issue Summary Card */}
             <div className="p-3 bg-[#F8FAFC] border border-slate-100 rounded-2xl flex items-center gap-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=200&q=80"
-                alt="Faucet"
-                className="w-12 h-12 rounded-xl object-cover shrink-0"
-              />
+              <div className="w-12 h-12 rounded-xl overflow-hidden relative shrink-0">
+                <Image
+                  src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=200&q=80"
+                  alt="Faucet"
+                  fill
+                  sizes="48px"
+                  className="object-cover"
+                />
+              </div>
               <div className="min-w-0">
                 <h4 className="text-[13.5px] font-bold text-slate-900 leading-tight">
                   Leaking Faucet
@@ -590,11 +600,12 @@ export function IssueDetailsFlowScreen({
                     key={idx}
                     className="relative w-14 h-14 rounded-2xl overflow-hidden shrink-0 border border-slate-200 shadow-2xs group"
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={photo}
                       alt={`Completion proof ${idx + 1}`}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="56px"
+                      className="object-cover"
                     />
                     {/* Red X Badge */}
                     <button
@@ -627,52 +638,13 @@ export function IssueDetailsFlowScreen({
       </div>
 
       {/* Bottom Navigation Bar */}
-      <nav className="h-16 bg-white border-t border-slate-100 px-3 flex items-center justify-around shrink-0 shadow-xs z-20">
-        <button
-          type="button"
-          onClick={onNavigateToDashboard}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <LayoutGrid className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Dashboard</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToProperties}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <Building className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Properties</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToApplications}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <FileText className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Applications</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToMessages}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <MessageSquareMore className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Messages</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToProfile}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <User className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Profile</span>
-        </button>
-      </nav>
+      <LandlordBottomNav
+        onNavigateToDashboard={onNavigateToDashboard}
+        onNavigateToProperties={onNavigateToProperties}
+        onNavigateToApplications={onNavigateToApplications}
+        onNavigateToMessages={onNavigateToMessages}
+        onNavigateToProfile={onNavigateToProfile}
+      />
     </div>
   );
 }

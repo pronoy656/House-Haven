@@ -8,11 +8,6 @@ import {
   UploadCloud,
   CheckCircle2,
   X,
-  LayoutGrid,
-  Search,
-  Repeat2,
-  Wrench,
-  User,
   Droplets,
   Bath,
   Utensils,
@@ -43,6 +38,8 @@ import {
   ClipboardList,
   MoreHorizontal,
 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { TenantBottomNav } from "./TenantBottomNav";
 
 interface TenantMaintenanceHubScreenProps {
   onBackToDashboard?: () => void;
@@ -81,7 +78,6 @@ export function TenantMaintenanceHubScreen({
   onViewIssueDetails,
 }: TenantMaintenanceHubScreenProps) {
   const [filter, setFilter] = useState<"All" | "Pending" | "Completed">("All");
-  const [activeTab, setActiveTab] = useState<"dashboard" | "search" | "matches" | "maintenance" | "profile">("maintenance");
 
   // Category Selection & Modal State
   const [selectedCategory, setSelectedCategory] = useState<CategoryItem | null>(null);
@@ -212,15 +208,17 @@ export function TenantMaintenanceHubScreen({
             </p>
           </div>
 
-          <button
-            type="button"
+          <Button
+            variant="icon"
+            size="icon-md"
             onClick={onNavigateToNotifications}
-            className="w-10 h-10 rounded-full bg-white shadow-2xs border border-slate-100 flex items-center justify-center text-slate-800 hover:bg-slate-50 transition-colors cursor-pointer relative shrink-0"
+            prefetchHref="/tenant/notifications"
+            className="relative shrink-0"
             title="Notifications"
           >
             <Bell className="w-5 h-5 stroke-[1.9]" />
             <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white" />
-          </button>
+          </Button>
         </div>
 
         {/* 2. Top "Report a Maintenance Issue" Banner */}
@@ -234,15 +232,16 @@ export function TenantMaintenanceHubScreen({
                 Let us know about any issues in your property and we&apos;ll take care of it.
               </p>
 
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={() => {
                   categoriesRef.current?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="mt-3.5 py-2.5 px-5 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-semibold text-xs transition-all shadow-sm cursor-pointer active:scale-95"
+                className="mt-3.5 font-semibold text-xs"
               >
                 Report an Issue
-              </button>
+              </Button>
             </div>
 
             {/* 3D House Illustration */}
@@ -270,18 +269,17 @@ export function TenantMaintenanceHubScreen({
           {(["All", "Pending", "Completed"] as const).map((tab) => {
             const isActive = filter === tab;
             return (
-              <button
+              <Button
                 key={tab}
                 type="button"
+                variant="pill"
+                size="sm"
+                isActive={isActive}
                 onClick={() => setFilter(tab)}
-                className={`py-2 px-6 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                  isActive
-                    ? "bg-[#0891A2] text-white shadow-xs"
-                    : "bg-[#F1F5F9] text-slate-600 hover:bg-slate-200"
-                }`}
+                className="px-6 py-2"
               >
                 {tab}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -362,13 +360,16 @@ export function TenantMaintenanceHubScreen({
 
                 {/* Request an Update Button (e.g., for issue 3) */}
                 {issue.hasRequestUpdateButton && (
-                  <button
+                  <Button
                     type="button"
+                    variant="primary"
+                    size="sm"
+                    fullWidth
                     onClick={() => alert("Update request sent to landlord!")}
-                    className="w-full py-2.5 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-semibold text-xs transition-colors shadow-xs cursor-pointer active:scale-[0.99]"
+                    className="py-2.5 rounded-full"
                   >
                     Request an Update
-                  </button>
+                  </Button>
                 )}
               </div>
             ))}
@@ -417,13 +418,14 @@ export function TenantMaintenanceHubScreen({
                 <h3 className="text-[15px] font-extrabold text-slate-900 leading-snug pr-2">
                   Submit an issuefor Rock Rd, Armagh, UK, BT60 3AB
                 </h3>
-                <button
-                  type="button"
+                <Button
+                  variant="icon"
+                  size="icon-xs"
                   onClick={() => setShowSubmitModal(false)}
-                  className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer shrink-0"
+                  className="bg-slate-100 text-slate-400 hover:text-slate-600 shrink-0"
                 >
                   <X className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
 
               {/* Category Pill Tag */}
@@ -492,19 +494,23 @@ export function TenantMaintenanceHubScreen({
 
               {/* Modal Buttons (Cancel & Submit) */}
               <div className="flex items-center gap-3 pt-2">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="md"
                   onClick={() => setShowSubmitModal(false)}
-                  className="flex-1 py-3 rounded-full border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="flex-1 rounded-full border-slate-200 text-slate-700"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
-                  className="flex-1 py-3 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-bold text-xs transition-colors shadow-sm cursor-pointer active:scale-95"
+                  variant="primary"
+                  size="md"
+                  className="flex-1 rounded-full shadow-sm"
                 >
                   Submit
-                </button>
+                </Button>
               </div>
             </form>
 
@@ -513,69 +519,16 @@ export function TenantMaintenanceHubScreen({
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          BOTTOM NAVIGATION BAR (Matching screenshot exactly)
+          BOTTOM NAVIGATION BAR (Standardized reusable component)
          ───────────────────────────────────────────────────────────── */}
-      <div className="shrink-0 z-30 bg-white border-t border-slate-100 px-3 py-2 flex items-center justify-around shadow-sm">
-        {/* Dashboard Tab */}
-        <button
-          type="button"
-          onClick={onBackToDashboard}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "dashboard" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <LayoutGrid className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Dashboard</span>
-        </button>
-
-        {/* Search Tab */}
-        <button
-          type="button"
-          onClick={onNavigateToSearch}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "search" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <Search className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Search</span>
-        </button>
-
-        {/* Matches Tab */}
-        <button
-          type="button"
-          onClick={onNavigateToMatches}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "matches" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <Repeat2 className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Matches</span>
-        </button>
-
-        {/* Maintenance Tab (ACTIVE) */}
-        <button
-          type="button"
-          onClick={() => setActiveTab("maintenance")}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "maintenance" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <Wrench className="w-5 h-5 stroke-[2.2]" />
-          <span className="text-[10px] font-semibold">Maintenance</span>
-        </button>
-
-        {/* Profile Tab */}
-        <button
-          type="button"
-          onClick={onNavigateToProfile}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "profile" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <User className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10px] font-medium">Profile</span>
-        </button>
-      </div>
+      <TenantBottomNav
+        activeTab="maintenance"
+        onNavigateToDashboard={onBackToDashboard}
+        onNavigateToSearch={onNavigateToSearch}
+        onNavigateToMatches={onNavigateToMatches}
+        onNavigateToMaintenance={() => {}}
+        onNavigateToProfile={onNavigateToProfile}
+      />
 
     </div>
   );

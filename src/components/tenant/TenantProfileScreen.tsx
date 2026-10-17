@@ -208,7 +208,7 @@ export function TenantProfileScreen({
             type="submit"
             variant="primary"
             isLoading={isSubmitting}
-            className="h-12 text-sm font-semibold tracking-wide border-0 shadow-none outline-none"
+            className="h-12 text-sm font-semibold tracking-wide border-0 shadow-none outline-none w-full"
           >
             Continue
           </Button>

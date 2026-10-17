@@ -23,10 +23,12 @@ export function SplashScreen({
   // Slide 1: "Manage with Ease" (with "Get Started" button)
   // Slide 2: "Find Better Tenants, Landlord Faster" (with "Sign Up" & "Sign in" buttons)
   const [currentSlide, setCurrentSlide] = useState<1 | 2>(initialSlide);
+  const [prevInitialSlide, setPrevInitialSlide] = useState<1 | 2>(initialSlide);
 
-  useEffect(() => {
+  if (initialSlide !== prevInitialSlide) {
+    setPrevInitialSlide(initialSlide);
     setCurrentSlide(initialSlide);
-  }, [initialSlide]);
+  }
 
   const handleGoToSlide2 = () => {
     setCurrentSlide(2);
@@ -47,6 +49,7 @@ export function SplashScreen({
           alt="House Haven Atmosphere"
           fill
           priority
+          sizes="(max-width: 480px) 100vw, 440px"
           className="object-cover transition-all duration-700 ease-in-out scale-100"
         />
         {/* Subtle Top Vignette Overlay for logo readability */}
@@ -113,7 +116,7 @@ export function SplashScreen({
               <Button
                 variant="primary"
                 onClick={handleGoToSlide2}
-                className="h-12 text-sm font-semibold tracking-wide border-0 outline-none"
+                className="h-12 text-sm font-semibold tracking-wide border-0 outline-none w-full"
               >
                 Get Started
               </Button>
@@ -138,14 +141,14 @@ export function SplashScreen({
               <Button
                 variant="primary"
                 onClick={onSignUp}
-                className="h-12 text-sm font-semibold tracking-wide border-0 outline-none shadow-none"
+                className="h-12 text-sm font-semibold tracking-wide border-0 outline-none shadow-none w-full"
               >
                 Sign Up
               </Button>
               <Button
                 variant="secondary"
                 onClick={onSignIn}
-                className="h-12 text-sm font-semibold tracking-wide border border-[#0891A2] text-[#0891A2] hover:bg-[#0891A2]/10"
+                className="h-12 text-sm font-semibold tracking-wide border border-[#0891A2] text-[#0891A2] hover:bg-[#0891A2]/10 w-full"
               >
                 Sign in
               </Button>

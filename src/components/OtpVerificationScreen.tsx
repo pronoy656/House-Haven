@@ -145,7 +145,7 @@ export function OtpVerificationScreen({
               type="submit"
               variant="primary"
               isLoading={isLoading}
-              className="h-12 font-semibold text-sm tracking-wide"
+              className="h-12 font-semibold text-sm tracking-wide w-full"
             >
               Verify &amp; Continue
             </Button>

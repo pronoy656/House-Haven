@@ -16,6 +16,7 @@ import {
   User,
   X,
 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 interface TenantOnboardingFlowScreenProps {
   onComplete?: () => void;
@@ -149,27 +150,11 @@ export function TenantOnboardingFlowScreen({
 
   return (
     <div className="relative w-full h-full max-h-[100dvh] bg-white flex flex-col justify-between text-slate-900 overflow-hidden select-none font-sans">
-      
-      {/* 1. TOP SYSTEM STATUS BAR (19:27) */}
-      <div className="shrink-0 pt-2.5 px-6 flex items-center justify-between text-slate-800 text-[13px] font-semibold tracking-tight z-20">
-        <span>19:27</span>
-        <div className="flex items-center gap-1.5">
-          <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-            <path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L12 22l7.03-4.39C20.26 16.07 21 14.12 21 12c0-4.97-4.03-9-9-9z" />
-          </svg>
-          <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-            <path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4z" />
-          </svg>
-          <div className="w-5 h-2.5 border border-slate-700 rounded-xs p-0.5 flex items-center">
-            <div className="w-full h-full bg-slate-800 rounded-2xs" />
-          </div>
-        </div>
-      </div>
-
-      {/* 2. NAVIGATION BAR & STEP INDICATOR */}
-      <div className="shrink-0 px-4 pt-3 pb-2 flex items-center relative">
-        <button
-          type="button"
+      {/* NAVIGATION BAR & STEP INDICATOR */}
+      <div className="shrink-0 px-4 pt-3.5 pb-2 flex items-center relative">
+        <Button
+          variant="icon"
+          size="icon-sm"
           onClick={() => {
             if (currentStep === 2) {
               setCurrentStep(1);
@@ -179,10 +164,10 @@ export function TenantOnboardingFlowScreen({
               router.push("/otp");
             }
           }}
-          className="w-9 h-9 rounded-full border border-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors shadow-2xs active:scale-95 cursor-pointer z-10"
+          className="z-10"
         >
           <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
-        </button>
+        </Button>
 
         {/* Center Progress Bar & Step Text */}
         <div className="absolute inset-x-0 flex flex-col items-center justify-center pointer-events-none">
@@ -323,13 +308,15 @@ export function TenantOnboardingFlowScreen({
 
             {/* Continue Button */}
             <div className="pt-4">
-              <button
+              <Button
                 type="button"
+                variant="primary"
+                size="lg"
+                fullWidth
                 onClick={() => setCurrentStep(2)}
-                className="w-full py-3.5 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-semibold text-xs transition-all shadow-xs cursor-pointer active:scale-[0.99] text-center"
               >
                 Continue
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -350,30 +337,28 @@ export function TenantOnboardingFlowScreen({
             </div>
 
             {/* Mode Switcher: Manual vs Chat */}
-            <div className="bg-[#F1F5F9] p-1 rounded-full flex items-center mb-4">
-              <button
+            <div className="bg-[#F1F5F9] p-1 rounded-full flex items-center mb-4 gap-1">
+              <Button
                 type="button"
+                variant="pill"
+                size="sm"
+                isActive={step2Mode === "manual"}
                 onClick={() => setStep2Mode("manual")}
-                className={`flex-1 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer text-center ${
-                  step2Mode === "manual"
-                    ? "bg-[#0891A2] text-white shadow-xs"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
+                className="flex-1 py-1.5"
               >
                 Manual
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="pill"
+                size="sm"
+                isActive={step2Mode === "chat"}
                 onClick={() => setStep2Mode("chat")}
-                className={`flex-1 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                  step2Mode === "chat"
-                    ? "bg-[#0891A2] text-white shadow-xs"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
+                leftIcon={<MessageSquare className="w-3.5 h-3.5" />}
+                className="flex-1 py-1.5"
               >
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>Chat</span>
-              </button>
+                Chat
+              </Button>
             </div>
 
             {/* CHAT MODE */}
@@ -407,13 +392,15 @@ export function TenantOnboardingFlowScreen({
                     placeholder="Type an answer..."
                     className="flex-1 bg-white border border-slate-200 rounded-full px-3.5 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0891A2]"
                   />
-                  <button
+                  <Button
                     type="button"
+                    variant="primary"
+                    size="icon-xs"
                     onClick={handleSendChatMessage}
-                    className="w-8 h-8 rounded-full bg-[#0891A2] text-white flex items-center justify-center hover:bg-[#078090] transition-colors shrink-0 shadow-xs active:scale-95 cursor-pointer"
+                    className="w-8 h-8 shrink-0 shadow-xs"
                   >
                     <Send className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
@@ -922,21 +909,26 @@ export function TenantOnboardingFlowScreen({
 
                 {/* Action Buttons: Continue & Skip */}
                 <div className="pt-4 space-y-2">
-                  <button
+                  <Button
                     type="button"
+                    variant="primary"
+                    size="lg"
+                    fullWidth
                     onClick={handleFinish}
-                    className="w-full py-3.5 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-semibold text-xs transition-all shadow-xs cursor-pointer active:scale-[0.99] text-center"
                   >
                     Continue
-                  </button>
+                  </Button>
 
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="md"
+                    fullWidth
                     onClick={handleSkip}
-                    className="w-full py-2 text-slate-500 hover:text-slate-800 text-xs font-semibold text-center cursor-pointer transition-colors"
+                    className="text-slate-500 hover:text-slate-800"
                   >
                     Skip
-                  </button>
+                  </Button>
                 </div>
 
               </div>

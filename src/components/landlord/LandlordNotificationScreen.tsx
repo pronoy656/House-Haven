@@ -11,15 +11,12 @@ import {
   MessageSquare,
   FileCheck,
   CheckCheck,
-  LayoutGrid,
-  Building,
-  FileText,
-  MessageSquareMore,
-  User,
   Clock,
   Sparkles,
 } from "lucide-react";
 import { MobileStatusBar } from "../MobileStatusBar";
+import { Button } from "@/components/ui/Button";
+import { LandlordBottomNav } from "./LandlordBottomNav";
 
 export interface NotificationItem {
   id: string;
@@ -156,14 +153,15 @@ export function LandlordNotificationScreen({
 
       {/* Top Header */}
       <div className="px-5 pt-3 pb-2 flex items-center justify-between shrink-0 z-20 bg-white border-b border-slate-50">
-        <button
-          type="button"
+        <Button
+          variant="icon"
+          size="icon-md"
           onClick={onBack || onNavigateToDashboard}
           aria-label="Back"
-          className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200/80 flex items-center justify-center text-slate-800 transition-colors cursor-pointer"
+          className="bg-slate-100 hover:bg-slate-200/80 text-slate-800"
         >
           <ArrowLeft className="w-5 h-5 stroke-[2]" />
-        </button>
+        </Button>
 
         <h1 className="text-[18px] font-bold text-slate-900 tracking-tight">
           Notification
@@ -246,25 +244,23 @@ export function LandlordNotificationScreen({
           className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 [&::-webkit-scrollbar]:hidden"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          <button
+          <Button
             type="button"
+            variant="pill"
+            size="xs"
+            isActive={filter === "all"}
             onClick={() => setFilter("all")}
-            className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-              filter === "all"
-                ? "bg-[#0891A2] text-white shadow-xs"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            }`}
+            className="px-3 py-1"
           >
             All ({notifications.length})
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="pill"
+            size="xs"
+            isActive={filter === "unread"}
             onClick={() => setFilter("unread")}
-            className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
-              filter === "unread"
-                ? "bg-[#0891A2] text-white shadow-xs"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            }`}
+            className="px-3 py-1 flex items-center gap-1.5"
           >
             Unread
             {unreadCount > 0 && (
@@ -276,18 +272,17 @@ export function LandlordNotificationScreen({
                 {unreadCount}
               </span>
             )}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="pill"
+            size="xs"
+            isActive={filter === "requests"}
             onClick={() => setFilter("requests")}
-            className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
-              filter === "requests"
-                ? "bg-[#0891A2] text-white shadow-xs"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            }`}
+            className="px-3 py-1"
           >
             Requests
-          </button>
+          </Button>
         </div>
 
         {unreadCount > 0 && (
@@ -322,14 +317,15 @@ export function LandlordNotificationScreen({
                       </div>
                     ) : (
                       <div className="relative w-11 h-11 rounded-full overflow-hidden bg-slate-200 shrink-0 ring-1 ring-slate-100">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={item.avatar}
+                        <Image
+                          src={item.avatar || "/landlord-avatar.jpg"}
                           alt="Notification avatar"
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="44px"
+                          className="object-cover"
                         />
                         {item.unread && (
-                          <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-[#0891A2] rounded-full ring-2 ring-white" />
+                          <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-[#0891A2] rounded-full ring-2 ring-white z-10" />
                         )}
                       </div>
                     )}
@@ -350,20 +346,24 @@ export function LandlordNotificationScreen({
                     <div className="pl-14">
                       {item.actionStatus === "pending" ? (
                         <div className="flex items-center gap-3 pt-0.5">
-                          <button
+                          <Button
                             type="button"
+                            variant="outline"
+                            size="sm"
                             onClick={() => handleAction(item.id, "rejected")}
-                            className="flex-1 h-9 rounded-full border border-[#0891A2] bg-white text-[#0891A2] font-semibold text-xs hover:bg-cyan-50/60 active:scale-98 transition-all cursor-pointer shadow-2xs"
+                            className="flex-1 h-9 rounded-full border-[#0891A2] text-[#0891A2]"
                           >
                             Reject
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             type="button"
+                            variant="primary"
+                            size="sm"
                             onClick={() => handleAction(item.id, "accepted")}
-                            className="flex-1 h-9 rounded-full bg-[#0891A2] hover:bg-[#078090] active:scale-98 text-white font-semibold text-xs transition-all cursor-pointer shadow-xs"
+                            className="flex-1 h-9 rounded-full shadow-xs"
                           >
                             Accept
-                          </button>
+                          </Button>
                         </div>
                       ) : item.actionStatus === "accepted" ? (
                         <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
@@ -405,14 +405,15 @@ export function LandlordNotificationScreen({
                       </div>
                     ) : (
                       <div className="relative w-11 h-11 rounded-full overflow-hidden bg-slate-200 shrink-0 ring-1 ring-slate-100">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={item.avatar}
+                        <Image
+                          src={item.avatar || "/landlord-avatar.jpg"}
                           alt="Notification avatar"
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="44px"
+                          className="object-cover"
                         />
                         {item.unread && (
-                          <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-[#0891A2] rounded-full ring-2 ring-white" />
+                          <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-[#0891A2] rounded-full ring-2 ring-white z-10" />
                         )}
                       </div>
                     )}
@@ -463,52 +464,14 @@ export function LandlordNotificationScreen({
       </div>
 
       {/* Bottom Navigation Bar */}
-      <nav className="h-16 bg-white border-t border-slate-100 px-3 flex items-center justify-around shrink-0 shadow-xs z-20">
-        <button
-          type="button"
-          onClick={onNavigateToDashboard}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <LayoutGrid className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Dashboard</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToProperties}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <Building className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Properties</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToApplications}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <FileText className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Applications</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToMessages}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <MessageSquareMore className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Messages</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToProfile}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <User className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Profile</span>
-        </button>
-      </nav>
+      <LandlordBottomNav
+        activeTab="dashboard"
+        onNavigateToDashboard={onNavigateToDashboard}
+        onNavigateToProperties={onNavigateToProperties}
+        onNavigateToApplications={onNavigateToApplications}
+        onNavigateToMessages={onNavigateToMessages}
+        onNavigateToProfile={onNavigateToProfile}
+      />
     </div>
   );
 }

@@ -10,14 +10,10 @@ import {
   Bed,
   Bath,
   Car,
-  LayoutGrid,
-  Building,
-  FileText,
-  MessageSquareMore,
-  User,
 } from "lucide-react";
 import { MobileStatusBar } from "../MobileStatusBar";
 import { Button } from "../ui/Button";
+import { LandlordBottomNav } from "./LandlordBottomNav";
 
 interface PropertyDetailsScreenProps {
   onBack?: () => void;
@@ -99,27 +95,31 @@ export function PropertyDetailsScreen({
 
       {/* Top Header - Fixed/Sticky */}
       <div className="px-5 pt-3 pb-2 flex items-center justify-between shrink-0 z-20 bg-white border-b border-slate-50">
-        <button
-          type="button"
+        <Button
+          variant="secondary"
+          size="icon-sm"
           onClick={onBack || onNavigateToProperties}
-          className="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+          aria-label="Back"
+          prefetchHref="/landlord/properties"
         >
           <ArrowLeft className="w-4 h-4" />
-        </button>
+        </Button>
 
         <h1 className="text-[17px] font-bold text-slate-900">
           Property Overview
         </h1>
 
-        <button
-          type="button"
+        <Button
+          variant="icon"
+          size="icon-sm"
           onClick={onNavigateToNotifications}
-          title="Notifications"
-          className="w-9 h-9 rounded-full flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer relative"
+          aria-label="Notifications"
+          prefetchHref="/landlord/notifications"
+          className="relative"
         >
           <Bell className="w-5 h-5 stroke-[1.8]" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#0891A2] rounded-full ring-2 ring-white" />
-        </button>
+        </Button>
       </div>
 
       {/* Main Scrollable Content */}
@@ -226,7 +226,7 @@ export function PropertyDetailsScreen({
         <div>
           <Button
             variant="primary"
-            className="h-11 font-semibold text-sm w-full rounded-2xl"
+            className="w-full"
           >
             Edit Property
           </Button>
@@ -347,63 +347,27 @@ export function PropertyDetailsScreen({
 
         {/* Secondary Back Button */}
         <div className="pt-2 pb-1">
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            size="md"
             onClick={onBack || onNavigateToProperties}
-            className="w-full h-11 rounded-full border border-slate-200 bg-white text-slate-800 font-semibold text-xs hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
+            prefetchHref="/landlord/properties"
+            className="w-full"
           >
             Back to My Properties
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Bottom Navigation Bar */}
-      <nav className="h-16 bg-white border-t border-slate-100 px-3 flex items-center justify-around shrink-0 shadow-xs z-20">
-        <button
-          type="button"
-          onClick={onNavigateToDashboard}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <LayoutGrid className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Dashboard</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToProperties}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-[#0891A2] font-semibold transition-all cursor-pointer"
-        >
-          <Building className="w-5 h-5 stroke-[2.2]" />
-          <span className="text-[10px] leading-none">Properties</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToApplications}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <FileText className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Applications</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToMessages}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <MessageSquareMore className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Messages</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToProfile}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <User className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Profile</span>
-        </button>
-      </nav>
+      <LandlordBottomNav
+        activeTab="properties"
+        onNavigateToDashboard={onNavigateToDashboard}
+        onNavigateToProperties={onNavigateToProperties}
+        onNavigateToApplications={onNavigateToApplications}
+        onNavigateToMessages={onNavigateToMessages}
+        onNavigateToProfile={onNavigateToProfile}
+      />
     </div>
   );
 }

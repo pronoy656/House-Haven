@@ -12,14 +12,11 @@ import {
   X,
   FileText,
   Download,
-  LayoutGrid,
-  Building,
-  FileCheck2,
-  MessageSquareMore,
-  User,
   CheckCircle2,
 } from "lucide-react";
 import { MobileStatusBar } from "../MobileStatusBar";
+import { Button } from "@/components/ui/Button";
+import { LandlordBottomNav } from "./LandlordBottomNav";
 
 interface ApplicationDetailsScreenProps {
   onBack?: () => void;
@@ -59,28 +56,31 @@ export function ApplicationDetailsScreen({
 
       {/* Top Header - Fixed/Sticky */}
       <div className="px-5 pt-3 pb-2 flex items-center justify-between shrink-0 z-20 bg-white border-b border-slate-50">
-        <button
-          type="button"
+        <Button
+          variant="secondary"
+          size="icon-md"
           onClick={onBack || onNavigateToApplications}
           aria-label="Back"
-          className="w-10 h-10 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-800 hover:bg-slate-50 transition-colors cursor-pointer"
+          prefetchHref="/landlord/applications"
         >
           <ArrowLeft className="w-5 h-5 stroke-[2]" />
-        </button>
+        </Button>
 
         <h1 className="text-[17.5px] font-bold text-slate-900 tracking-tight">
           Applications details
         </h1>
 
-        <button
-          type="button"
+        <Button
+          variant="icon"
+          size="icon-md"
           onClick={onNavigateToNotifications}
           aria-label="Notifications"
-          className="w-10 h-10 rounded-full flex items-center justify-center text-slate-800 hover:bg-slate-50 transition-colors cursor-pointer relative"
+          prefetchHref="/landlord/notifications"
+          className="relative"
         >
           <Bell className="w-5 h-5 stroke-[1.8]" />
           <span className="absolute top-2 right-2 w-2 h-2 bg-[#0891A2] rounded-full ring-2 ring-white" />
-        </button>
+        </Button>
       </div>
 
       {/* Main Scrollable Content */}
@@ -95,13 +95,13 @@ export function ApplicationDetailsScreen({
         {/* 1. Tenant Profile Card */}
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3.5">
-            {/* Tenant Photo */}
-            <div className="w-[68px] h-[68px] rounded-2xl overflow-hidden bg-slate-100 ring-1 ring-slate-200/80 shrink-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+            <div className="w-[68px] h-[68px] rounded-2xl overflow-hidden bg-slate-100 ring-1 ring-slate-200/80 shrink-0 relative">
+              <Image
                 src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80"
                 alt="Brooklyn Simmons"
-                className="w-full h-full object-cover"
+                fill
+                sizes="68px"
+                className="object-cover"
               />
             </div>
 
@@ -126,11 +126,12 @@ export function ApplicationDetailsScreen({
           </div>
 
           {/* Favorite Heart Button */}
-          <button
-            type="button"
+          <Button
+            variant="icon"
+            size="icon-sm"
             onClick={() => setIsFavorite((prev) => !prev)}
             aria-label="Add to favorites"
-            className="w-8 h-8 rounded-full flex items-center justify-center text-rose-500 hover:bg-rose-50 transition-colors cursor-pointer shrink-0 mt-0.5"
+            className="text-rose-500 hover:bg-rose-50 shrink-0 mt-0.5"
           >
             <Heart
               className={`w-4 h-4 transition-all ${
@@ -139,19 +140,19 @@ export function ApplicationDetailsScreen({
                   : "text-rose-400 hover:text-rose-600"
               }`}
             />
-          </button>
+          </Button>
         </div>
 
         {/* 2. Property Card */}
         <div className="p-3 bg-[#F8FAFC] border border-slate-100 rounded-2xl flex items-center justify-between shadow-2xs">
           <div className="flex items-center gap-3 min-w-0">
-            {/* Property Photo */}
-            <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-200 shrink-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+            <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-200 shrink-0 relative">
+              <Image
                 src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=300&q=80"
                 alt="Riverside Apartments"
-                className="w-full h-full object-cover"
+                fill
+                sizes="56px"
+                className="object-cover"
               />
             </div>
 
@@ -497,21 +498,23 @@ export function ApplicationDetailsScreen({
         <div className="pt-1 pb-2">
           {decisionState === "none" ? (
             <div className="flex items-center gap-3">
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="md"
                 onClick={() => setDecisionState("passed")}
-                className="flex-1 h-11 rounded-full border border-slate-200 bg-white text-slate-800 font-semibold text-xs hover:bg-slate-50 active:scale-98 transition-all cursor-pointer shadow-2xs"
+                className="flex-1"
               >
                 Pass
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="primary"
+                size="md"
                 onClick={() => setDecisionState("loved")}
-                className="flex-1 h-11 rounded-full bg-[#0891A2] hover:bg-[#078090] active:scale-98 text-white font-semibold text-xs transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5"
+                leftIcon={<Heart className="w-4 h-4 text-white fill-white/20" />}
+                className="flex-1"
               >
-                <Heart className="w-4 h-4 text-white fill-white/20" />
-                <span>Love</span>
-              </button>
+                Love
+              </Button>
             </div>
           ) : decisionState === "loved" ? (
             <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between">
@@ -519,13 +522,14 @@ export function ApplicationDetailsScreen({
                 <CheckCircle2 className="w-4 h-4" />
                 <span>Application Approved &amp; Loved ❤️</span>
               </div>
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="xs"
                 onClick={() => setDecisionState("none")}
-                className="text-[11px] font-semibold text-emerald-800 underline cursor-pointer"
+                className="text-[11px] font-semibold text-emerald-800 underline p-0 h-auto"
               >
                 Reset
-              </button>
+              </Button>
             </div>
           ) : (
             <div className="p-3 bg-slate-100 border border-slate-200 rounded-2xl flex items-center justify-between">
@@ -533,65 +537,28 @@ export function ApplicationDetailsScreen({
                 <X className="w-4 h-4" />
                 <span>Application Passed</span>
               </div>
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="xs"
                 onClick={() => setDecisionState("none")}
-                className="text-[11px] font-semibold text-slate-800 underline cursor-pointer"
+                className="text-[11px] font-semibold text-slate-800 underline p-0 h-auto"
               >
                 Reset
-              </button>
+              </Button>
             </div>
           )}
         </div>
       </div>
 
       {/* Bottom Navigation Bar */}
-      <nav className="h-16 bg-white border-t border-slate-100 px-3 flex items-center justify-around shrink-0 shadow-xs z-20">
-        <button
-          type="button"
-          onClick={onNavigateToDashboard}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <LayoutGrid className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Dashboard</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToProperties}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <Building className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Properties</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToApplications}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-[#0891A2] font-semibold transition-all cursor-pointer"
-        >
-          <FileCheck2 className="w-5 h-5 stroke-[2.2]" />
-          <span className="text-[10px] leading-none">Applications</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToMessages}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <MessageSquareMore className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Messages</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onNavigateToProfile}
-          className="flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <User className="w-5 h-5 stroke-[1.8]" />
-          <span className="text-[10px] leading-none">Profile</span>
-        </button>
-      </nav>
+      <LandlordBottomNav
+        activeTab="applications"
+        onNavigateToDashboard={onNavigateToDashboard}
+        onNavigateToProperties={onNavigateToProperties}
+        onNavigateToApplications={onNavigateToApplications}
+        onNavigateToMessages={onNavigateToMessages}
+        onNavigateToProfile={onNavigateToProfile}
+      />
     </div>
   );
 }

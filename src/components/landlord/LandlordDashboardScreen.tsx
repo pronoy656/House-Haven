@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   LayoutGrid,
   Building,
@@ -14,6 +15,8 @@ import {
   Wrench,
   MessageCircle,
 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { LandlordBottomNav } from "./LandlordBottomNav";
 import { MobileStatusBar } from "../MobileStatusBar";
 
 interface LandlordDashboardScreenProps {
@@ -59,27 +62,30 @@ export function LandlordDashboardScreen({
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
+          <Button
+            variant="icon"
+            size="icon-sm"
             onClick={onNavigateToNotifications}
-            title="Notifications"
-            className="w-9 h-9 rounded-full flex items-center justify-center text-slate-800 hover:bg-slate-50 transition-colors cursor-pointer relative"
+            prefetchHref="/landlord/notifications"
+            className="w-9 h-9 rounded-full relative"
+            aria-label="Notifications"
           >
             <Bell className="w-5 h-5 stroke-[1.8]" />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#0891A2] rounded-full ring-2 ring-white" />
-          </button>
+          </Button>
 
           {/* Profile Avatar */}
           <div
             onClick={onNavigateToProfile}
-            className="w-10 h-10 rounded-full overflow-hidden bg-slate-200 ring-1 ring-slate-200 shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+            className="w-10 h-10 rounded-full overflow-hidden bg-slate-200 ring-1 ring-slate-200 shrink-0 cursor-pointer hover:opacity-90 transition-opacity relative"
             title="Profile"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80"
               alt="John Smith"
-              className="w-full h-full object-cover"
+              fill
+              sizes="40px"
+              className="object-cover"
             />
           </div>
         </div>
@@ -264,104 +270,15 @@ export function LandlordDashboardScreen({
         </div>
       </div>
 
-      {/* Bottom Navigation Bar matching Image 3 exact icons */}
-      <nav className="h-16 bg-white border-t border-slate-100 px-3 flex items-center justify-around shrink-0 shadow-xs z-20">
-        {/* 1. Dashboard */}
-        <button
-          type="button"
-          onClick={() => setActiveTab("dashboard")}
-          className={`flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl transition-all cursor-pointer ${
-            activeTab === "dashboard"
-              ? "text-[#0891A2] font-semibold"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
-        >
-          <LayoutGrid
-            className={`w-5 h-5 ${
-              activeTab === "dashboard" ? "stroke-[2.2]" : "stroke-[1.8]"
-            }`}
-          />
-          <span className="text-[10px] leading-none">Dashboard</span>
-        </button>
-
-        {/* 2. Properties */}
-        <button
-          type="button"
-          onClick={onNavigateToProperties || (() => setActiveTab("properties"))}
-          className={`flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl transition-all cursor-pointer ${
-            activeTab === "properties"
-              ? "text-[#0891A2] font-semibold"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
-        >
-          <Building
-            className={`w-5 h-5 ${
-              activeTab === "properties" ? "stroke-[2.2]" : "stroke-[1.8]"
-            }`}
-          />
-          <span className="text-[10px] leading-none">Properties</span>
-        </button>
-
-        {/* 3. Applications */}
-        <button
-          type="button"
-          onClick={onNavigateToApplications || (() => setActiveTab("applications"))}
-          className={`flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl transition-all cursor-pointer ${
-            activeTab === "applications"
-              ? "text-[#0891A2] font-semibold"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
-        >
-          <FileText
-            className={`w-5 h-5 ${
-              activeTab === "applications" ? "stroke-[2.2]" : "stroke-[1.8]"
-            }`}
-          />
-          <span className="text-[10px] leading-none">Applications</span>
-        </button>
-
-        {/* 4. Messages */}
-        <button
-          type="button"
-          onClick={() => setActiveTab("messages")}
-          className={`flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl transition-all cursor-pointer ${
-            activeTab === "messages"
-              ? "text-[#0891A2] font-semibold"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
-        >
-          <MessageSquareMore
-            className={`w-5 h-5 ${
-              activeTab === "messages" ? "stroke-[2.2]" : "stroke-[1.8]"
-            }`}
-          />
-          <span className="text-[10px] leading-none">Messages</span>
-        </button>
-
-        {/* 5. Profile */}
-        <button
-          type="button"
-          onClick={() => {
-            if (onNavigateToProfile) {
-              onNavigateToProfile();
-            } else {
-              setActiveTab("profile");
-            }
-          }}
-          className={`flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl transition-all cursor-pointer ${
-            activeTab === "profile"
-              ? "text-[#0891A2] font-semibold"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
-        >
-          <User
-            className={`w-5 h-5 ${
-              activeTab === "profile" ? "stroke-[2.2]" : "stroke-[1.8]"
-            }`}
-          />
-          <span className="text-[10px] leading-none">Profile</span>
-        </button>
-      </nav>
+      {/* Bottom Navigation Bar */}
+      <LandlordBottomNav
+        activeTab={activeTab}
+        onNavigateToDashboard={() => setActiveTab("dashboard")}
+        onNavigateToProperties={onNavigateToProperties || (() => setActiveTab("properties"))}
+        onNavigateToApplications={onNavigateToApplications || (() => setActiveTab("applications"))}
+        onNavigateToMessages={() => setActiveTab("messages")}
+        onNavigateToProfile={onNavigateToProfile || (() => setActiveTab("profile"))}
+      />
     </div>
   );
 }

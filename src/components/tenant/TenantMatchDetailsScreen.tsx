@@ -17,6 +17,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { TenantBottomNav } from "./TenantBottomNav";
 
 interface TenantMatchDetailsScreenProps {
   onBackToDashboard?: () => void;
@@ -62,6 +64,7 @@ export function TenantMatchDetailsScreen({
             alt="Match Details"
             fill
             priority
+            sizes="(max-width: 480px) 100vw, 440px"
             className="object-cover object-right-bottom"
           />
 
@@ -75,15 +78,17 @@ export function TenantMatchDetailsScreen({
             </h1>
 
             {/* Notification Bell */}
-            <button
-              type="button"
+            <Button
+              variant="icon"
+              size="icon-md"
               onClick={onNavigateToNotifications}
-              className="w-10 h-10 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-800 hover:bg-slate-50 transition-colors cursor-pointer relative"
-              title="Notifications"
+              prefetchHref="/tenant/notifications"
+              className="bg-white shadow-sm border border-slate-100 relative"
+              aria-label="Notifications"
             >
-              <Bell className="w-5 h-5 stroke-[1.9]" />
+              <Bell className="w-5 h-5 stroke-[1.9] text-slate-800" />
               <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white" />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -211,11 +216,12 @@ export function TenantMatchDetailsScreen({
             className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-100 shadow-2xs cursor-pointer hover:border-slate-200 transition-colors"
           >
             <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-200 relative shrink-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
                 alt="Landlord Test"
-                className="w-full h-full object-cover"
+                fill
+                sizes="40px"
+                className="object-cover"
               />
             </div>
             <div>
@@ -260,22 +266,27 @@ export function TenantMatchDetailsScreen({
               {/* Action Buttons */}
               <div className="space-y-2.5 pt-1">
                 {/* Proceed Button */}
-                <button
-                  type="button"
+                <Button
+                  variant="primary"
+                  size="md"
+                  fullWidth
                   onClick={() => setHasProceeded(true)}
-                  className="w-full py-3.5 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-bold text-xs sm:text-[13px] transition-all shadow-sm active:scale-[0.99] cursor-pointer"
+                  className="font-bold text-xs sm:text-[13px]"
                 >
                   I&apos;m Interested – Proceed with Property
-                </button>
+                </Button>
 
                 {/* Not Interested Button */}
-                <button
-                  type="button"
+                <Button
+                  variant="outline"
+                  size="md"
+                  fullWidth
                   onClick={onBackToDashboard}
-                  className="w-full py-3 rounded-full border border-slate-200 text-slate-700 font-semibold text-xs text-center hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer active:scale-[0.99]"
+                  prefetchHref="/tenant/dashboard"
+                  className="font-semibold text-xs"
                 >
                   Not Interested – Do Not Proceed
-                </button>
+                </Button>
               </div>
 
               <p className="text-[10px] text-slate-400 text-center leading-tight pt-1">
@@ -325,13 +336,16 @@ export function TenantMatchDetailsScreen({
                 </p>
 
                 {/* Back to Matches Button */}
-                <button
-                  type="button"
+                <Button
+                  variant="outline"
+                  size="md"
+                  fullWidth
                   onClick={onBackToDashboard}
-                  className="w-full mt-2 py-3 rounded-full border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer active:scale-[0.99]"
+                  prefetchHref="/tenant/dashboard"
+                  className="mt-2 font-semibold text-xs"
                 >
                   Back to Matches
-                </button>
+                </Button>
 
                 {/* Undo Toggle for reviewer testing */}
                 <div className="text-center pt-1">
@@ -351,67 +365,14 @@ export function TenantMatchDetailsScreen({
       </div>
 
       {/* 4. Bottom Navigation Bar */}
-      <div className="shrink-0 z-30 bg-white border-t border-slate-100 px-3 py-2 flex items-center justify-around shadow-sm">
-        {/* Dashboard Tab */}
-        <button
-          type="button"
-          onClick={onBackToDashboard}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "dashboard" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <LayoutGrid className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10.5px] font-medium">Dashboard</span>
-        </button>
-
-        {/* Search Tab */}
-        <button
-          type="button"
-          onClick={onNavigateToSearch}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "search" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <Search className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10.5px] font-medium">Search</span>
-        </button>
-
-        {/* Matches Tab (ACTIVE highlighted) */}
-        <button
-          type="button"
-          onClick={() => setActiveTab("matches")}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "matches" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <Repeat2 className="w-5 h-5 stroke-[2.2]" />
-          <span className="text-[10.5px] font-semibold">Matches</span>
-        </button>
-
-        {/* Maintenance Tab */}
-        <button
-          type="button"
-          onClick={onNavigateToMaintenance}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "maintenance" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <Wrench className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10.5px] font-medium">Maintenance</span>
-        </button>
-
-        {/* Profile Tab */}
-        <button
-          type="button"
-          onClick={onNavigateToProfile}
-          className={`flex flex-col items-center gap-1 py-1 px-2 cursor-pointer transition-colors ${
-            activeTab === "profile" ? "text-[#0891A2]" : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          <User className="w-5 h-5 stroke-[2]" />
-          <span className="text-[10.5px] font-medium">Profile</span>
-        </button>
-      </div>
+      <TenantBottomNav
+        activeTab={activeTab}
+        onNavigateToDashboard={onBackToDashboard}
+        onNavigateToSearch={onNavigateToSearch}
+        onNavigateToMatches={() => setActiveTab("matches")}
+        onNavigateToMaintenance={onNavigateToMaintenance}
+        onNavigateToProfile={onNavigateToProfile}
+      />
 
     </div>
   );
