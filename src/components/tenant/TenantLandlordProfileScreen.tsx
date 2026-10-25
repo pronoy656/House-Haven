@@ -14,7 +14,10 @@ import {
   MailCheck,
   CheckCircle2,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/shared/Button";
+import { ScreenHeader } from "@/components/shared/ScreenHeader";
+import { StarRating } from "@/components/shared/StarRating";
+import { Avatar } from "@/components/shared/Avatar";
 import { TenantBottomNav } from "./TenantBottomNav";
 
 interface TenantLandlordProfileScreenProps {
@@ -107,6 +110,7 @@ export function TenantLandlordProfileScreen({
               src="/landlord-cover.jpg"
               alt="Landlord Cover"
               fill
+              sizes="(max-width: 480px) 100vw, 440px"
               priority
               className="object-cover"
             />
@@ -134,6 +138,7 @@ export function TenantLandlordProfileScreen({
                 src="/john-wick-avatar.jpg"
                 alt="John Wick"
                 fill
+                sizes="84px"
                 priority
                 className="object-cover"
               />
@@ -249,23 +254,11 @@ export function TenantLandlordProfileScreen({
       {currentView === "reviews" && (
         <div className="flex-1 min-h-0 flex flex-col overflow-y-auto no-scrollbar">
 
-          {/* Top Bar with Back Button */}
-          <div className="shrink-0 px-5 pt-4 pb-2 flex items-center justify-between">
-            <Button
-              variant="icon"
-              size="icon-sm"
-              onClick={() => setCurrentView("profile")}
-              title="Back to Landlord Profile"
-            >
-              <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
-            </Button>
-
-            <h1 className="text-[17px] font-bold text-slate-900 tracking-tight">
-              John Wick Reviews
-            </h1>
-
-            <div className="w-9" />
-          </div>
+          {/* Reusable Header */}
+          <ScreenHeader
+            title="John Wick Reviews"
+            onBack={() => setCurrentView("profile")}
+          />
 
           {/* Reviews Content */}
           <div className="px-5 pt-2 pb-8 space-y-4">
@@ -277,14 +270,8 @@ export function TenantLandlordProfileScreen({
                 <div className="text-[34px] font-black text-slate-900 leading-none">
                   4.4
                 </div>
-                {/* 5 Star Icons */}
-                <div className="flex items-center gap-1 pt-1">
-                  <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                  <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                  <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                  <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                  <Star className="w-4 h-4 text-slate-200 fill-slate-200" />
-                </div>
+                {/* Reusable Star Rating */}
+                <StarRating rating={4.4} size="md" />
                 <div className="text-[11px] text-slate-400 font-medium">
                   Based on 32 review
                 </div>
@@ -328,15 +315,11 @@ export function TenantLandlordProfileScreen({
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 relative shrink-0">
-                          <Image
-                            src={rev.avatar}
-                            alt={rev.name}
-                            fill
-                            sizes="36px"
-                            className="object-cover"
-                          />
-                        </div>
+                        <Avatar
+                          src={rev.avatar}
+                          alt={rev.name}
+                          size="sm"
+                        />
                         <h3 className="text-[13px] font-bold text-slate-900 leading-tight">
                           {rev.name}
                         </h3>

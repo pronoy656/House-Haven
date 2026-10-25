@@ -2,8 +2,9 @@
 
 import React, { useState, useRef } from "react";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
-import { Button } from "./ui/Button";
-import { MobileStatusBar } from "./MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { InputField } from "@/components/shared/InputField";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
 
 interface OtpVerificationScreenProps {
   email?: string;
@@ -107,7 +108,7 @@ export function OtpVerificationScreen({
         <form onSubmit={handleVerify} className="w-full space-y-6">
           <div className="flex justify-between gap-2 max-w-[320px] mx-auto">
             {otp.map((digit, index) => (
-              <input
+              <InputField
                 key={index}
                 ref={(el) => {
                   inputRefs.current[index] = el;
@@ -118,7 +119,8 @@ export function OtpVerificationScreen({
                 value={digit}
                 onChange={(e) => handleChange(e.target.value.replace(/\D/g, ""), index)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
-                className="w-11 h-13 text-center text-lg font-bold text-slate-900 bg-[#F4F6F9] border border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-[#0891A2] focus:ring-2 focus:ring-[#0891A2]/20 transition-all"
+                containerClassName="w-11"
+                className="w-11 h-13 text-center text-lg font-bold px-0 rounded-xl"
               />
             ))}
           </div>

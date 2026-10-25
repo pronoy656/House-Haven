@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { ArrowLeft, ChevronDown, Eye, EyeOff } from "lucide-react";
-import { MobileStatusBar } from "../MobileStatusBar";
-import { Button } from "../ui/Button";
+import { ArrowLeft, ChevronDown } from "lucide-react";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { InputField } from "@/components/shared/InputField";
 
 interface LandlordContactScreenProps {
   onBack?: () => void;
@@ -25,8 +26,6 @@ export function LandlordContactScreen({
   const [phoneNumber, setPhoneNumber] = useState("123 456 7890");
   const [password, setPassword] = useState("••••••••••••");
   const [confirmPassword, setConfirmPassword] = useState("••••••••••••");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,22 +73,19 @@ export function LandlordContactScreen({
 
         <div className="space-y-4">
           {/* Email Address */}
-          <div className="space-y-1.5 text-left">
-            <label className="text-[12px] font-medium text-slate-600 block">
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="demo@gmail.com"
-              className="w-full h-11 px-3.5 rounded-xl bg-[#F8FAFC] border border-slate-100 text-slate-800 text-[13px] focus:outline-none focus:ring-1 focus:ring-[#0891A2] focus:bg-white transition-all"
-            />
-          </div>
+          <InputField
+            label="Email Address"
+            type="email"
+            variant="filled"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="demo@gmail.com"
+            className="bg-[#F8FAFC] border-slate-100 text-xs sm:text-[13px] rounded-xl h-11"
+          />
 
           {/* Phone Number */}
           <div className="space-y-1.5 text-left">
-            <label className="text-[12px] font-medium text-slate-600 block">
+            <label className="text-[12px] font-medium text-slate-600 block pl-1">
               Phone Number
             </label>
             <div className="flex gap-2">
@@ -109,69 +105,39 @@ export function LandlordContactScreen({
               </div>
 
               {/* Number Input */}
-              <input
+              <InputField
                 type="tel"
+                variant="filled"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 placeholder="123 456 7890"
-                className="flex-1 h-11 px-3.5 rounded-xl bg-[#F8FAFC] border border-slate-100 text-slate-800 text-[13px] focus:outline-none focus:ring-1 focus:ring-[#0891A2] focus:bg-white transition-all"
+                containerClassName="flex-1"
+                className="bg-[#F8FAFC] border-slate-100 text-xs sm:text-[13px] rounded-xl h-11"
               />
             </div>
           </div>
 
           {/* Password */}
-          <div className="space-y-1.5 text-left">
-            <label className="text-[12px] font-medium text-slate-600 block">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Create a password"
-                className="w-full h-11 pl-3.5 pr-10 rounded-xl bg-[#F8FAFC] border border-slate-100 text-slate-800 text-[13px] focus:outline-none focus:ring-1 focus:ring-[#0891A2] focus:bg-white transition-all"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
-              >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-          </div>
+          <InputField
+            label="Password"
+            type="password"
+            variant="filled"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Create a password"
+            className="bg-[#F8FAFC] border-slate-100 text-xs sm:text-[13px] rounded-xl h-11"
+          />
 
           {/* Confirm Password */}
-          <div className="space-y-1.5 text-left">
-            <label className="text-[12px] font-medium text-slate-600 block">
-              Confirm Password
-            </label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm password"
-                className="w-full h-11 pl-3.5 pr-10 rounded-xl bg-[#F8FAFC] border border-slate-100 text-slate-800 text-[13px] focus:outline-none focus:ring-1 focus:ring-[#0891A2] focus:bg-white transition-all"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-          </div>
+          <InputField
+            label="Confirm Password"
+            type="password"
+            variant="filled"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Confirm password"
+            className="bg-[#F8FAFC] border-slate-100 text-xs sm:text-[13px] rounded-xl h-11"
+          />
           </div>
         </div>
 

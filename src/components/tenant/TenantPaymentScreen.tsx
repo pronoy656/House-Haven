@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { ArrowLeft, MoreVertical, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/shared/Button";
+import { InputField } from "@/components/shared/InputField";
 
 import { PaymentSuccessScreen } from "@/components/tenant/PaymentSuccessScreen";
 
@@ -152,68 +153,49 @@ export function TenantPaymentScreen({
         <form onSubmit={handleSubmit} className="space-y-3.5 pt-1">
           
           {/* Card Number */}
-          <div className="space-y-1">
-            <label className="block text-xs font-medium text-slate-500 pl-0.5">
-              Card Number
-            </label>
-            <input
-              type="text"
-              required
-              value={cardNumber}
-              onChange={(e) => setCardNumber(e.target.value)}
-              placeholder="Enter Card Number"
-              className="w-full h-12 px-4 bg-[#F8FAFC] text-slate-900 font-medium rounded-2xl text-xs sm:text-sm border border-slate-100 focus:outline-none focus:bg-white focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2] transition-all shadow-2xs"
-            />
-          </div>
+          <InputField
+            label="Card Number"
+            type="text"
+            required
+            value={cardNumber}
+            onChange={(e) => setCardNumber(e.target.value)}
+            placeholder="Enter Card Number"
+          />
 
           {/* Card Holder Name */}
-          <div className="space-y-1">
-            <label className="block text-xs font-medium text-slate-500 pl-0.5">
-              Card Holder Name
-            </label>
-            <input
-              type="text"
-              required
-              value={cardHolder}
-              onChange={(e) => setCardHolder(e.target.value)}
-              placeholder="Enter Card Holder Name"
-              className="w-full h-12 px-4 bg-[#F8FAFC] text-slate-900 font-medium rounded-2xl text-xs sm:text-sm border border-slate-100 focus:outline-none focus:bg-white focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2] transition-all shadow-2xs"
-            />
-          </div>
+          <InputField
+            label="Card Holder Name"
+            type="text"
+            required
+            value={cardHolder}
+            onChange={(e) => setCardHolder(e.target.value)}
+            placeholder="Enter Card Holder Name"
+          />
 
           {/* Expired & CVV Code Row */}
           <div className="grid grid-cols-2 gap-3">
-            
-            <div className="space-y-1">
-              <label className="block text-xs font-medium text-slate-500 pl-0.5">
-                Expired
-              </label>
-              <input
-                type="text"
-                required
-                maxLength={5}
-                value={expiry}
-                onChange={(e) => setExpiry(e.target.value)}
-                placeholder="MM/YY"
-                className="w-full h-12 px-4 bg-[#F8FAFC] text-slate-900 font-medium rounded-2xl text-xs sm:text-sm border border-slate-100 focus:outline-none focus:bg-white focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2] transition-all shadow-2xs text-center"
-              />
-            </div>
+            <InputField
+              label="Expired"
+              type="text"
+              required
+              maxLength={5}
+              value={expiry}
+              onChange={(e) => setExpiry(e.target.value)}
+              placeholder="MM/YY"
+              className="text-center"
+            />
 
-            <div className="space-y-1">
-              <label className="block text-xs font-medium text-slate-500 pl-0.5">
-                CVV Code
-              </label>
-              <input
-                type="password"
-                required
-                maxLength={4}
-                value={cvv}
-                onChange={(e) => setCvv(e.target.value)}
-                placeholder="CVV"
-                className="w-full h-12 px-4 bg-[#F8FAFC] text-slate-900 font-medium rounded-2xl text-xs sm:text-sm border border-slate-100 focus:outline-none focus:bg-white focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2] transition-all shadow-2xs text-center"
-              />
-            </div>
-
+            <InputField
+              label="CVV Code"
+              type="password"
+              required
+              maxLength={4}
+              value={cvv}
+              onChange={(e) => setCvv(e.target.value)}
+              placeholder="CVV"
+              showPasswordToggle={false}
+              className="text-center"
+            />
           </div>
 
           {/* Success Notification */}

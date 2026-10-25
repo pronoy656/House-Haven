@@ -3,7 +3,7 @@
 import React, { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { TenantOnboardingFlowScreen } from "@/components/tenant/TenantOnboardingFlowScreen";
-import { MobileContainer } from "@/components/MobileContainer";
+import { MobileContainer } from "@/components/shared/MobileContainer";
 
 export default function TenantOnboardingPortalPage() {
   const router = useRouter();

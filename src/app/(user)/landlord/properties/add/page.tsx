@@ -3,7 +3,7 @@
 import React, { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { AddPropertyFlowScreen } from "@/components/landlord/AddPropertyFlowScreen";
-import { MobileContainer } from "@/components/MobileContainer";
+import { MobileContainer } from "@/components/shared/MobileContainer";
 
 export default function LandlordAddPropertyPage() {
   const router = useRouter();

@@ -2,8 +2,10 @@
 
 import React, { useState, useRef } from "react";
 import { ArrowLeft, UploadCloud, Zap, Image as ImageIcon } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { MobileStatusBar } from "@/components/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { InputField } from "@/components/shared/InputField";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { ScreenHeader } from "@/components/shared/ScreenHeader";
 import Image from "next/image";
 
 interface ProblemScreenProps {
@@ -67,24 +69,11 @@ export function ProblemScreen({
   return (
     <div className="relative w-full h-full max-h-[100dvh] bg-white flex flex-col justify-between p-6 pt-4 pb-6 text-slate-900 overflow-hidden">
       {/* Top Header */}
-      <div className="pt-2 pb-3 shrink-0 z-20 bg-white">
-        <div className="relative flex items-center justify-between">
-          <button
-            type="button"
-            onClick={onBack}
-            className="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
-            aria-label="Back"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </button>
-
-          <h1 className="text-lg font-bold text-slate-900 tracking-tight">
-            Problem
-          </h1>
-
-          <div className="w-9"></div>
-        </div>
-      </div>
+      <ScreenHeader
+        title="Problem"
+        onBack={onBack}
+        className="px-0 pt-2 pb-3"
+      />
 
       {/* Scrollable Form Body */}
       <form onSubmit={handleSubmit} className="flex-1 min-h-0 flex flex-col justify-between">
@@ -104,18 +93,14 @@ export function ProblemScreen({
         </div>
 
         {/* Issue Name */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-medium text-slate-500 pl-1">
-            Issue
-          </label>
-          <input
-            type="text"
-            value={issue}
-            onChange={(e) => setIssue(e.target.value)}
-            placeholder="e.g. Electricity problem in house"
-            className="w-full h-12 px-4 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2] transition-all"
-          />
-        </div>
+        <InputField
+          label="Issue"
+          type="text"
+          variant="outlined"
+          value={issue}
+          onChange={(e) => setIssue(e.target.value)}
+          placeholder="e.g. Electricity problem in house"
+        />
 
         {/* Detailed Description */}
         <div className="space-y-1.5">
@@ -153,6 +138,7 @@ export function ProblemScreen({
                   src={photoPreview}
                   alt="Issue photo"
                   fill
+                  sizes="(max-width: 480px) 100vw, 440px"
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-black/40 text-white text-xs flex items-center justify-center font-medium">
@@ -171,18 +157,15 @@ export function ProblemScreen({
         </div>
 
         {/* Quoted Price */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-medium text-slate-500 pl-1">
-            Quoted
-          </label>
-          <input
-            type="text"
-            value={quoted}
-            onChange={(e) => setQuoted(e.target.value)}
-            placeholder="$75–$100"
-            className="w-full h-12 px-4 border border-slate-200 rounded-2xl text-sm font-medium text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2] transition-all"
-          />
-        </div>
+        <InputField
+          label="Quoted"
+          type="text"
+          variant="outlined"
+          value={quoted}
+          onChange={(e) => setQuoted(e.target.value)}
+          placeholder="$75–$100"
+          className="font-medium"
+        />
       </div>
 
         {/* Action Buttons Row */}

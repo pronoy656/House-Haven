@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import {
-  Bell,
   Search,
   Repeat2,
   MessageSquare,
@@ -11,10 +10,10 @@ import {
   Wrench,
   Users,
   ArrowRight,
-  LayoutGrid,
-  User,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/shared/Button";
+import { NotificationButton } from "@/components/shared/NotificationButton";
+import { HeroBanner } from "@/components/shared/HeroBanner";
 import { TenantBottomNav } from "./TenantBottomNav";
 
 interface TenantDashboardScreenProps {
@@ -28,6 +27,41 @@ interface TenantDashboardScreenProps {
   onNavigateToTenantManagement?: () => void;
   initialCompleted?: boolean;
 }
+
+interface QuickAccessCard {
+  id: string;
+  title: string;
+  description: string;
+  count: number;
+  icon: React.ReactNode;
+  iconBg: string;
+  iconColor: string;
+  onClick?: () => void;
+}
+
+const GETTING_STARTED_STEPS = [
+  {
+    step: 1,
+    title: "Complete Your Profile",
+    description: "Add your personal, employment, and rental history so landlords can understand your application.",
+  },
+  {
+    step: 2,
+    title: "Browse Properties",
+    description: "Explore available properties that match your budget and preferences.",
+    illustration: "/checklist-illustration-3d.png",
+  },
+  {
+    step: 3,
+    title: "Like & Match",
+    description: "Like properties you're interested in and get matched With landlords.",
+  },
+  {
+    step: 4,
+    title: "Chat & Agree",
+    description: "Message landlords, arrange viewings, and review agreements all in one place.",
+  },
+];
 
 export function TenantDashboardScreen({
   onNavigateToNotifications,
@@ -49,6 +83,49 @@ export function TenantDashboardScreen({
   });
   const [activeTab, setActiveTab] = useState<"dashboard" | "search" | "matches" | "maintenance" | "profile">("dashboard");
 
+  const quickAccessGrid: QuickAccessCard[] = [
+    {
+      id: "matches",
+      title: "Matches",
+      description: "Mutual matches with landlords",
+      count: 0,
+      icon: <Repeat2 className="w-4 h-4 stroke-[2.2]" />,
+      iconBg: "bg-rose-50",
+      iconColor: "text-rose-500",
+      onClick: onNavigateToMatches,
+    },
+    {
+      id: "messages",
+      title: "Messages",
+      description: "Chat with landlords",
+      count: 0,
+      icon: <MessageSquare className="w-4 h-4 stroke-[2]" />,
+      iconBg: "bg-cyan-50",
+      iconColor: "text-[#06B6D4]",
+      onClick: onNavigateToMessages,
+    },
+    {
+      id: "agreements",
+      title: "Agreements",
+      description: "Review and sign lease agreements",
+      count: 1,
+      icon: <FileText className="w-4 h-4 stroke-[2]" />,
+      iconBg: "bg-amber-50",
+      iconColor: "text-amber-500",
+      onClick: onNavigateToAgreements,
+    },
+    {
+      id: "maintenance",
+      title: "Maintenance",
+      description: "Report and track issues",
+      count: 3,
+      icon: <Wrench className="w-4 h-4 stroke-[2]" />,
+      iconBg: "bg-emerald-50",
+      iconColor: "text-emerald-500",
+      onClick: onNavigateToMaintenance,
+    },
+  ];
+
   return (
     <div className="relative w-full h-full max-h-[100dvh] bg-[#F8FAFC] flex flex-col justify-between text-slate-900 overflow-hidden select-none">
       
@@ -56,22 +133,13 @@ export function TenantDashboardScreen({
       <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar">
 
         {/* 1. Top Hero Landscape Header */}
-        <div className="relative w-full h-[152px] overflow-hidden">
-          {/* Background Illustration */}
-          <Image
-            src="/tenant-banner-landscape.png"
-            alt="Welcome Tenant"
-            fill
-            priority
-            sizes="(max-width: 480px) 100vw, 440px"
-            className="object-cover object-right-bottom"
-          />
-
-          {/* Left Gradient Overlay for text legibility */}
-          <div className="absolute inset-0 bg-gradient-to-r from-sky-50/95 via-sky-50/70 to-transparent pointer-events-none" />
-
-          {/* Header Content */}
-          <div className="relative z-10 px-5 pt-4 flex items-start justify-between">
+        <HeroBanner
+          imageSrc="/tenant-banner-landscape.png"
+          imageAlt="Welcome Tenant"
+          heightClass="h-[152px]"
+          gradientOverlay="from-sky-50/95 via-sky-50/70 to-transparent"
+        >
+          <div className="px-5 pt-4 flex items-start justify-between">
             <div className="pt-1">
               <span className="text-[13px] font-medium text-slate-700 block leading-tight">
                 Welcome back
@@ -84,25 +152,18 @@ export function TenantDashboardScreen({
               </p>
             </div>
 
-            {/* Notification Bell with red dot */}
-            <Button
-              variant="icon"
-              size="icon-md"
+            <NotificationButton
               onClick={onNavigateToNotifications}
               prefetchHref="/tenant/notifications"
-              className="bg-white shadow-md border border-white/60 relative shrink-0"
-              aria-label="Notifications"
-            >
-              <Bell className="w-5 h-5 stroke-[1.9] text-slate-800" />
-              <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white" />
-            </Button>
+              className="shadow-md border border-white/60"
+            />
           </div>
-        </div>
+        </HeroBanner>
 
         {/* Main Body Content Container */}
         <div className="px-5 pt-3 pb-8 space-y-4">
 
-          {/* 2. Top Banner Card: EITHER Incomplete Profile OR "You're all set!" (As requested: placed at the TOP) */}
+          {/* 2. Top Banner Card: EITHER Incomplete Profile OR "You're all set!" */}
           {!isProfileComplete ? (
             /* Incomplete Profile Setup Card */
             <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 transition-all duration-300">
@@ -226,101 +287,31 @@ export function TenantDashboardScreen({
 
             {/* 2x2 Grid */}
             <div className="grid grid-cols-2 gap-3">
-              {/* Matches Card */}
-              <div
-                onClick={onNavigateToMatches}
-                className="bg-white rounded-2xl p-3.5 border border-slate-100 shadow-xs flex flex-col justify-between hover:border-slate-200 transition-all cursor-pointer"
-              >
-                <div>
-                  <div className="w-8 h-8 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 mb-2">
-                    <Repeat2 className="w-4 h-4 stroke-[2.2]" />
+              {quickAccessGrid.map((card) => (
+                <div
+                  key={card.id}
+                  onClick={card.onClick}
+                  className="bg-white rounded-2xl p-3.5 border border-slate-100 shadow-xs flex flex-col justify-between hover:border-slate-200 transition-all cursor-pointer"
+                >
+                  <div>
+                    <div className={`w-8 h-8 rounded-xl ${card.iconBg} flex items-center justify-center ${card.iconColor} mb-2`}>
+                      {card.icon}
+                    </div>
+                    <h3 className="text-[13px] font-bold text-slate-800 leading-tight">
+                      {card.title}
+                    </h3>
+                    <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                      {card.description}
+                    </p>
                   </div>
-                  <h3 className="text-[13px] font-bold text-slate-800 leading-tight">
-                    Matches
-                  </h3>
-                  <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
-                    Mutual matches with landlords
-                  </p>
-                </div>
-                <div className="flex items-center justify-between pt-3 mt-1 border-t border-slate-50">
-                  <span className="text-xs font-bold text-slate-800">0</span>
-                  <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                    <ArrowRight className="w-3 h-3 stroke-[2]" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Messages Card */}
-              <div
-                onClick={onNavigateToMessages}
-                className="bg-white rounded-2xl p-3.5 border border-slate-100 shadow-xs flex flex-col justify-between hover:border-slate-200 transition-all cursor-pointer"
-              >
-                <div>
-                  <div className="w-8 h-8 rounded-xl bg-cyan-50 flex items-center justify-center text-[#06B6D4] mb-2">
-                    <MessageSquare className="w-4 h-4 stroke-[2]" />
-                  </div>
-                  <h3 className="text-[13px] font-bold text-slate-800 leading-tight">
-                    Messages
-                  </h3>
-                  <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
-                    Chat with landlords
-                  </p>
-                </div>
-                <div className="flex items-center justify-between pt-3 mt-1 border-t border-slate-50">
-                  <span className="text-xs font-bold text-slate-800">0</span>
-                  <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                    <ArrowRight className="w-3 h-3 stroke-[2]" />
+                  <div className="flex items-center justify-between pt-3 mt-1 border-t border-slate-50">
+                    <span className="text-xs font-bold text-slate-800">{card.count}</span>
+                    <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                      <ArrowRight className="w-3 h-3 stroke-[2]" />
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Agreements Card */}
-              <div
-                onClick={onNavigateToAgreements}
-                className="bg-white rounded-2xl p-3.5 border border-slate-100 shadow-xs flex flex-col justify-between hover:border-slate-200 transition-all cursor-pointer"
-              >
-                <div>
-                  <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 mb-2">
-                    <FileText className="w-4 h-4 stroke-[2]" />
-                  </div>
-                  <h3 className="text-[13px] font-bold text-slate-800 leading-tight">
-                    Agreements
-                  </h3>
-                  <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
-                    Review and sign lease agreements
-                  </p>
-                </div>
-                <div className="flex items-center justify-between pt-3 mt-1 border-t border-slate-50">
-                  <span className="text-xs font-bold text-slate-800">1</span>
-                  <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                    <ArrowRight className="w-3 h-3 stroke-[2]" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Maintenance Card */}
-              <div
-                onClick={onNavigateToMaintenance}
-                className="bg-white rounded-2xl p-3.5 border border-slate-100 shadow-xs flex flex-col justify-between hover:border-slate-200 transition-all cursor-pointer"
-              >
-                <div>
-                  <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 mb-2">
-                    <Wrench className="w-4 h-4 stroke-[2]" />
-                  </div>
-                  <h3 className="text-[13px] font-bold text-slate-800 leading-tight">
-                    Maintenance
-                  </h3>
-                  <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
-                    Report and track issues
-                  </p>
-                </div>
-                <div className="flex items-center justify-between pt-3 mt-1 border-t border-slate-50">
-                  <span className="text-xs font-bold text-slate-800">3</span>
-                  <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                    <ArrowRight className="w-3 h-3 stroke-[2]" />
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Tenant's Management Full Width Card (Active Tenancy) */}
@@ -361,85 +352,54 @@ export function TenantDashboardScreen({
 
             {/* Stepper with continuous vertical line */}
             <div className="relative pl-1">
-              {/* Step 1 */}
-              <div className="relative flex items-start gap-3 pb-6">
-                {/* Connecting line */}
-                <div className="absolute left-3 top-6 bottom-0 w-[1.5px] bg-[#0891A2]" />
-                <div className="relative z-10 w-6 h-6 rounded-full bg-[#0891A2] text-white flex items-center justify-center text-[11px] font-bold shrink-0">
-                  1
-                </div>
-                <div className="pt-0.5">
-                  <h3 className="text-[12.5px] font-bold text-slate-800 leading-tight">
-                    Complete Your Profile
-                  </h3>
-                  <p className="text-[10.5px] text-slate-500 leading-relaxed mt-0.5">
-                    Add your personal, employment, and rental history so landlords can understand your application.
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 2 */}
-              <div className="relative flex items-start gap-3 pb-6">
-                {/* Connecting line */}
-                <div className="absolute left-3 top-6 bottom-0 w-[1.5px] bg-[#0891A2]" />
-                <div className="relative z-10 w-6 h-6 rounded-full bg-[#0891A2] text-white flex items-center justify-center text-[11px] font-bold shrink-0">
-                  2
-                </div>
-                <div className="pt-0.5 flex-1 pr-1">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-[12.5px] font-bold text-slate-800 leading-tight">
-                        Browse Properties
-                      </h3>
-                      <p className="text-[10.5px] text-slate-500 leading-relaxed mt-0.5 max-w-[190px]">
-                        Explore available properties that match your budget and preferences.
-                      </p>
+              {GETTING_STARTED_STEPS.map((stepItem, idx) => {
+                const isLast = idx === GETTING_STARTED_STEPS.length - 1;
+                return (
+                  <div
+                    key={stepItem.step}
+                    className={`relative flex items-start gap-3 ${isLast ? "" : "pb-6"}`}
+                  >
+                    {!isLast && (
+                      <div className="absolute left-3 top-6 bottom-0 w-[1.5px] bg-[#0891A2]" />
+                    )}
+                    <div className="relative z-10 w-6 h-6 rounded-full bg-[#0891A2] text-white flex items-center justify-center text-[11px] font-bold shrink-0">
+                      {stepItem.step}
                     </div>
-                    {/* Cute 3D House / Clipboard Illustration */}
-                    <div className="w-12 h-12 relative shrink-0 -mt-1">
-                      <Image
-                        src="/browse-step-icon.jpg"
-                        alt="Browse"
-                        fill
-                        sizes="48px"
-                        className="object-contain rounded-lg"
-                      />
+                    <div className="pt-0.5 flex-1 pr-1">
+                      {stepItem.illustration ? (
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h3 className="text-[12.5px] font-bold text-slate-800 leading-tight">
+                              {stepItem.title}
+                            </h3>
+                            <p className="text-[10.5px] text-slate-500 leading-relaxed mt-0.5 max-w-[190px]">
+                              {stepItem.description}
+                            </p>
+                          </div>
+                          <div className="w-12 h-12 relative shrink-0 -mt-1">
+                            <Image
+                              src={stepItem.illustration}
+                              alt={stepItem.title}
+                              fill
+                              sizes="48px"
+                              className="object-contain drop-shadow-sm"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <h3 className="text-[12.5px] font-bold text-slate-800 leading-tight">
+                            {stepItem.title}
+                          </h3>
+                          <p className="text-[10.5px] text-slate-500 leading-relaxed mt-0.5">
+                            {stepItem.description}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Step 3 */}
-              <div className="relative flex items-start gap-3 pb-6">
-                {/* Connecting line */}
-                <div className="absolute left-3 top-6 bottom-0 w-[1.5px] bg-[#0891A2]" />
-                <div className="relative z-10 w-6 h-6 rounded-full bg-[#0891A2] text-white flex items-center justify-center text-[11px] font-bold shrink-0">
-                  3
-                </div>
-                <div className="pt-0.5">
-                  <h3 className="text-[12.5px] font-bold text-slate-800 leading-tight">
-                    Like &amp; Match
-                  </h3>
-                  <p className="text-[10.5px] text-slate-500 leading-relaxed mt-0.5">
-                    Like properties you&apos;re interested in and get matched With landlords.
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 4 */}
-              <div className="relative flex items-start gap-3">
-                <div className="relative z-10 w-6 h-6 rounded-full bg-[#0891A2] text-white flex items-center justify-center text-[11px] font-bold shrink-0">
-                  4
-                </div>
-                <div className="pt-0.5">
-                  <h3 className="text-[12.5px] font-bold text-slate-800 leading-tight">
-                    Chat &amp; Agree
-                  </h3>
-                  <p className="text-[10.5px] text-slate-500 leading-relaxed mt-0.5">
-                    Message landlords, arrange viewings, and review agreements all in one place.
-                  </p>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
         </div>

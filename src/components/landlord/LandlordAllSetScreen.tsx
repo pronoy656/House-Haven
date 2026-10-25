@@ -3,8 +3,8 @@
 import React from "react";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
-import { MobileStatusBar } from "../MobileStatusBar";
-import { Button } from "../ui/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
 
 interface LandlordAllSetScreenProps {
   onBack?: () => void;
@@ -78,6 +78,7 @@ export function LandlordAllSetScreen({
             src="/landlord-house-illustration.png"
             alt="All set house illustration"
             fill
+            sizes="270px"
             className="object-contain"
             priority
           />

@@ -3,7 +3,7 @@
 import React, { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { TenantMaintenanceHubScreen } from "@/components/tenant/TenantMaintenanceHubScreen";
-import { MobileContainer } from "@/components/MobileContainer";
+import { MobileContainer } from "@/components/shared/MobileContainer";
 
 export default function TenantMaintenancePage() {
   const router = useRouter();

@@ -2,8 +2,9 @@
 
 import React, { useState } from "react";
 import { ArrowLeft, Calendar, ChevronDown, UploadCloud } from "lucide-react";
-import { MobileStatusBar } from "../MobileStatusBar";
-import { Button } from "../ui/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { InputField } from "@/components/shared/InputField";
 
 interface LandlordPersonalInfoScreenProps {
   onBack?: () => void;
@@ -92,37 +93,27 @@ export function LandlordPersonalInfoScreen({
           </div>
 
           {/* Full Name */}
-          <div className="space-y-1.5 text-left">
-            <label className="text-[12px] font-medium text-slate-600 block">
-              Full Name
-            </label>
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Your name"
-              className="w-full h-11 px-3.5 rounded-xl bg-[#F8FAFC] border border-slate-100 text-slate-800 text-[13px] focus:outline-none focus:ring-1 focus:ring-[#0891A2] focus:bg-white transition-all"
-            />
-          </div>
+          <InputField
+            label="Full Name"
+            type="text"
+            variant="filled"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Your name"
+            className="bg-[#F8FAFC] border-slate-100 text-xs sm:text-[13px] rounded-xl h-11"
+          />
 
           {/* Date of Birth */}
-          <div className="space-y-1.5 text-left">
-            <label className="text-[12px] font-medium text-slate-600 block">
-              Date of Birth
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <Calendar className="w-4 h-4" />
-              </div>
-              <input
-                type="text"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-                placeholder="09/3/1985"
-                className="w-full h-11 pl-10 pr-3.5 rounded-xl bg-[#F8FAFC] border border-slate-100 text-slate-800 text-[13px] focus:outline-none focus:ring-1 focus:ring-[#0891A2] focus:bg-white transition-all"
-              />
-            </div>
-          </div>
+          <InputField
+            label="Date of Birth"
+            type="text"
+            variant="filled"
+            leftIcon={<Calendar className="w-4 h-4 text-slate-400" />}
+            value={dob}
+            onChange={(e) => setDob(e.target.value)}
+            placeholder="09/3/1985"
+            className="bg-[#F8FAFC] border-slate-100 text-xs sm:text-[13px] rounded-xl h-11"
+          />
 
           {/* Gender */}
           <div className="space-y-1.5 text-left">

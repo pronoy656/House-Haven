@@ -3,7 +3,7 @@
 import React, { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { TenantLandlordProfileScreen } from "@/components/tenant/TenantLandlordProfileScreen";
-import { MobileContainer } from "@/components/MobileContainer";
+import { MobileContainer } from "@/components/shared/MobileContainer";
 
 function LandlordProfileContent() {
   const router = useRouter();

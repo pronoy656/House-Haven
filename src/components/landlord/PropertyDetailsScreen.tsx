@@ -11,8 +11,9 @@ import {
   Bath,
   Car,
 } from "lucide-react";
-import { MobileStatusBar } from "../MobileStatusBar";
-import { Button } from "../ui/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { NotificationButton } from "@/components/shared/NotificationButton";
 import { LandlordBottomNav } from "./LandlordBottomNav";
 
 interface PropertyDetailsScreenProps {
@@ -109,17 +110,13 @@ export function PropertyDetailsScreen({
           Property Overview
         </h1>
 
-        <Button
-          variant="icon"
-          size="icon-sm"
+        <NotificationButton
+          size="sm"
+          role="landlord"
+          dotColor="primary"
           onClick={onNavigateToNotifications}
-          aria-label="Notifications"
           prefetchHref="/landlord/notifications"
-          className="relative"
-        >
-          <Bell className="w-5 h-5 stroke-[1.8]" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#0891A2] rounded-full ring-2 ring-white" />
-        </Button>
+        />
       </div>
 
       {/* Main Scrollable Content */}

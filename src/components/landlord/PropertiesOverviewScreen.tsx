@@ -12,8 +12,9 @@ import {
   MessageSquareMore,
   User,
 } from "lucide-react";
-import { MobileStatusBar } from "../MobileStatusBar";
-import { Button } from "../ui/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { NotificationButton } from "@/components/shared/NotificationButton";
 import { LandlordBottomNav } from "./LandlordBottomNav";
 
 interface PropertiesOverviewScreenProps {
@@ -98,15 +99,13 @@ export function PropertiesOverviewScreen({
           Properties Overview
         </h1>
 
-        <button
-          type="button"
+        <NotificationButton
+          size="sm"
+          role="landlord"
+          dotColor="primary"
           onClick={onNavigateToNotifications}
-          title="Notifications"
-          className="w-9 h-9 rounded-full flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer relative"
-        >
-          <Bell className="w-5 h-5 stroke-[1.8]" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#0891A2] rounded-full ring-2 ring-white" />
-        </button>
+          prefetchHref="/landlord/notifications"
+        />
       </div>
 
       {/* Main Scrollable Content */}

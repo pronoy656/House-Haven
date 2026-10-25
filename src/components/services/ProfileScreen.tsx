@@ -13,8 +13,9 @@ import {
   CheckCircle2,
   LogOut,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { MobileStatusBar } from "@/components/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { InputField } from "@/components/shared/InputField";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
 
 interface ProfileScreenProps {
   onNavigateToServices?: () => void;
@@ -107,59 +108,41 @@ export function ProfileScreen({
 
         <form onSubmit={handleSave} className="space-y-3.5">
           {/* Full Name */}
-          <div className="space-y-1">
-            <label className="block text-xs font-medium text-slate-500 pl-1">
-              Full Name
-            </label>
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="w-full h-12 px-4 border border-slate-200 rounded-2xl text-xs text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2] transition-all font-medium"
-            />
-          </div>
+          <InputField
+            label="Full Name"
+            type="text"
+            variant="outlined"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+          />
 
           {/* Date of Birth */}
-          <div className="space-y-1">
-            <label className="block text-xs font-medium text-slate-500 pl-1">
-              Date of Birth
-            </label>
-            <div className="relative flex items-center">
-              <input
-                type="text"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-                className="w-full h-12 pl-4 pr-10 border border-slate-200 rounded-2xl text-xs text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2] transition-all font-medium"
-              />
-              <Calendar className="absolute right-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
-            </div>
-          </div>
+          <InputField
+            label="Date of Birth"
+            type="text"
+            variant="outlined"
+            value={dob}
+            onChange={(e) => setDob(e.target.value)}
+            rightIcon={<Calendar className="w-4 h-4 text-slate-400 stroke-[1.8]" />}
+          />
 
           {/* Phone Number */}
-          <div className="space-y-1">
-            <label className="block text-xs font-medium text-slate-500 pl-1">
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full h-12 px-4 border border-slate-200 rounded-2xl text-xs text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2] transition-all font-medium"
-            />
-          </div>
+          <InputField
+            label="Phone Number"
+            type="tel"
+            variant="outlined"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
 
           {/* E-mail */}
-          <div className="space-y-1">
-            <label className="block text-xs font-medium text-slate-500 pl-1">
-              E-mail
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-12 px-4 border border-slate-200 rounded-2xl text-xs text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2] transition-all font-medium"
-            />
-          </div>
+          <InputField
+            label="E-mail"
+            type="email"
+            variant="outlined"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
           {/* Post code */}
           <div className="space-y-1">

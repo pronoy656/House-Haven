@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { ArrowLeft, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { MobileStatusBar } from "@/components/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
 
 interface SelectAddressScreenProps {
   onBack?: () => void;

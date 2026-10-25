@@ -12,7 +12,7 @@ import {
   AlertCircle,
   HelpCircle,
 } from "lucide-react";
-import { Button } from "../ui/Button";
+import { Button } from "@/components/shared/Button";
 
 interface ProofOfAddressScreenProps {
   onBack?: () => void;

@@ -3,7 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { LayoutGrid, Search, Repeat2, Wrench, User } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/shared/Button";
 
 export type TenantNavTab = "dashboard" | "search" | "matches" | "maintenance" | "profile";
 

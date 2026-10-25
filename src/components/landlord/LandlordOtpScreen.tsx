@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MobileStatusBar } from "../MobileStatusBar";
-import { HouseHavenLogo } from "../HouseHavenLogo";
-import { Button } from "../ui/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { HouseHavenLogo } from "@/components/shared/HouseHavenLogo";
+import { Button } from "@/components/shared/Button";
+import { InputField } from "@/components/shared/InputField";
 
 interface LandlordOtpScreenProps {
   email?: string;
@@ -86,7 +87,7 @@ export function LandlordOtpScreen({
         {/* 6-Digit OTP Boxes */}
         <div className="flex items-center justify-center gap-2.5 my-8">
           {otp.map((digit, idx) => (
-            <input
+            <InputField
               key={idx}
               id={`otp-input-${idx}`}
               type="text"
@@ -96,7 +97,8 @@ export function LandlordOtpScreen({
               onChange={(e) => handleChange(idx, e.target.value)}
               onKeyDown={(e) => handleKeyDown(idx, e)}
               placeholder="-"
-              className="w-10 h-12 sm:w-11 sm:h-13 rounded-2xl bg-[#F8FAFC] border border-slate-100 text-center text-lg font-bold text-slate-800 placeholder-slate-300 focus:outline-none focus:ring-1 focus:ring-[#0891A2] focus:bg-white transition-all"
+              containerClassName="w-10 sm:w-11"
+              className="w-10 h-12 sm:w-11 sm:h-13 rounded-2xl bg-[#F8FAFC] border-slate-100 text-center text-lg font-bold text-slate-800 placeholder-slate-300 px-0"
             />
           ))}
         </div>

@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { MobileStatusBar } from "./MobileStatusBar";
-import { Button } from "./ui/Button";
-import { Check, Wrench } from "lucide-react";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { Check, Home, User, Wrench } from "lucide-react";
 
 interface RoleSelectionScreenProps {
   onNavigateToSignIn?: () => void;
@@ -12,13 +12,46 @@ interface RoleSelectionScreenProps {
   showStatusBar?: boolean;
 }
 
+export type RoleId = "landlord" | "tenant" | "services";
+
 interface RoleOption {
-  id: string;
+  id: RoleId;
   title: string;
   description: string;
   bgColor: string;
-  icon: React.ReactNode;
+  iconColor: string;
+  icon: React.ComponentType<{ className?: string }>;
 }
+
+const ROLES: RoleOption[] = [
+  {
+    id: "landlord",
+    title: "I'm a Landlord",
+    description:
+      "List and manage properties, review applications, manage tenants, maintenance and more.",
+    bgColor: "bg-[#E6F0FA]",
+    iconColor: "text-[#2B7FFF]",
+    icon: Home,
+  },
+  {
+    id: "tenant",
+    title: "I'm a Tenant",
+    description:
+      "Find properties, apply, manage your tenancy and communicate with landlords.",
+    bgColor: "bg-[#D6F5EC]",
+    iconColor: "text-[#0D9488]",
+    icon: User,
+  },
+  {
+    id: "services",
+    title: "I'm looking for Services",
+    description:
+      "Browse and request services without creating a landlord or tenant profile.",
+    bgColor: "bg-[#FDF0DE]",
+    iconColor: "text-[#D97706]",
+    icon: Wrench,
+  },
+];
 
 export function RoleSelectionScreen({
   onNavigateToSignIn,
@@ -26,54 +59,8 @@ export function RoleSelectionScreen({
   brandTitle = "TenantFind",
   showStatusBar = true,
 }: RoleSelectionScreenProps) {
-  const [selectedRole, setSelectedRole] = useState<string>("tenant");
+  const [selectedRole, setSelectedRole] = useState<RoleId>("tenant");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const roles: RoleOption[] = [
-    {
-      id: "landlord",
-      title: "I'm a Landlord",
-      description:
-        "List and manage properties, review applications, manage tenants, maintenance and more.",
-      bgColor: "bg-[#E6F0FA]",
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          className="w-10 h-10 text-[#2B7FFF] fill-current"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M10.707 2.293a1.83 1.83 0 0 1 2.586 0l8.207 8.207a1.25 1.25 0 0 1-.884 2.134H19.5v7.116a2.25 2.25 0 0 1-2.25 2.25h-2.5a1.25 1.25 0 0 1-1.25-1.25V17a1 1 0 0 0-1-1h-1a1 1 0 0 0-1 1v3.75a1.25 1.25 0 0 1-1.25 1.25H6.75A2.25 2.25 0 0 1 4.5 19.75V12.634H3.384a1.25 1.25 0 0 1-.884-2.134l8.207-8.207z" />
-        </svg>
-      ),
-    },
-    {
-      id: "tenant",
-      title: "I'm a Tenant",
-      description:
-        "Find properties, apply, manage your tenancy and communicate with landlords.",
-      bgColor: "bg-[#D6F5EC]",
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          className="w-10 h-10 text-[#0D9488] fill-current"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle cx="12" cy="7.25" r="4.25" />
-          <path d="M4.75 20.25c0-4.05 3.25-7.25 7.25-7.25s7.25 3.2 7.25 7.25c0 .41-.34.75-.75.75H5.5a.75.75 0 0 1-.75-.75z" />
-        </svg>
-      ),
-    },
-    {
-      id: "services",
-      title: "I'm looking for Services",
-      description:
-        "Browse and request services without creating a landlord or tenant profile.",
-      bgColor: "bg-[#FDF0DE]",
-      icon: (
-        <Wrench className="w-8 h-8 sm:w-9 sm:h-9 text-[#D97706] stroke-[2.3]" />
-      ),
-    },
-  ];
 
   const handleContinue = () => {
     setIsSubmitting(true);
@@ -104,8 +91,9 @@ export function RoleSelectionScreen({
 
         {/* Role Options */}
         <div className="space-y-3.5 my-auto px-1.5 py-1">
-          {roles.map((role) => {
+          {ROLES.map((role) => {
             const isSelected = selectedRole === role.id;
+            const Icon = role.icon;
             return (
               <div
                 key={role.id}
@@ -120,7 +108,7 @@ export function RoleSelectionScreen({
                 <div
                   className={`w-14 h-14 sm:w-16 sm:h-16 rounded-[18px] shrink-0 flex items-center justify-center ${role.bgColor} transition-transform duration-200`}
                 >
-                  {role.icon}
+                  <Icon className={`w-8 h-8 sm:w-9 sm:h-9 ${role.iconColor} stroke-[2.2]`} />
                 </div>
 
                 {/* Text Content */}

@@ -3,7 +3,7 @@
 import React, { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChooseDateTimeScreen } from "@/components/services/ChooseDateTimeScreen";
-import { MobileContainer } from "@/components/MobileContainer";
+import { MobileContainer } from "@/components/shared/MobileContainer";
 
 function DateTimeContent() {
   const router = useRouter();

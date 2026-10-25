@@ -3,7 +3,7 @@
 import React, { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { OtpVerificationScreen } from "@/components/OtpVerificationScreen";
-import { MobileContainer } from "@/components/MobileContainer";
+import { MobileContainer } from "@/components/shared/MobileContainer";
 
 function OtpContent() {
   const router = useRouter();

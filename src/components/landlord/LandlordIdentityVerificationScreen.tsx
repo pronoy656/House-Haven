@@ -18,7 +18,7 @@ import {
   FileText,
   UserCheck,
 } from "lucide-react";
-import { Button } from "../ui/Button";
+import { Button } from "@/components/shared/Button";
 
 interface LandlordIdentityVerificationScreenProps {
   onBack?: () => void;

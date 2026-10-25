@@ -2,7 +2,7 @@
 
 import React from "react";
 import { ArrowLeft, ArrowUp, Home } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/shared/Button";
 
 interface TenantBoostScreenProps {
   onBack: () => void;

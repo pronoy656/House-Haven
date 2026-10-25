@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { MobileStatusBar } from "./MobileStatusBar";
-import { Button } from "./ui/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
 
 interface SplashScreenProps {
   onSignUp?: () => void;
@@ -67,6 +67,7 @@ export function SplashScreen({
             width={78}
             height={78}
             className="w-[72px] sm:w-[78px] h-auto object-contain drop-shadow-xl"
+            style={{ width: "auto", height: "auto" }}
             priority
           />
         </div>

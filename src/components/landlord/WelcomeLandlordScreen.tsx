@@ -3,8 +3,8 @@
 import React from "react";
 import Image from "next/image";
 import { Check, ArrowRight } from "lucide-react";
-import { MobileStatusBar } from "../MobileStatusBar";
-import { Button } from "../ui/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
 
 interface WelcomeLandlordScreenProps {
   onGetStarted?: () => void;
@@ -33,6 +33,7 @@ export function WelcomeLandlordScreen({
             src="/landlord-house-illustration.png"
             alt="Welcome Landlord Illustration"
             fill
+            sizes="280px"
             className="object-contain"
             priority
           />

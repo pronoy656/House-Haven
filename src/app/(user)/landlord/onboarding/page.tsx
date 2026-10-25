@@ -11,7 +11,7 @@ import { LandlordOverviewScreen } from "@/components/landlord/LandlordOverviewSc
 import { LandlordIdentityVerificationScreen } from "@/components/landlord/LandlordIdentityVerificationScreen";
 import { ProofOfAddressScreen } from "@/components/landlord/ProofOfAddressScreen";
 import { LandlordAllSetScreen } from "@/components/landlord/LandlordAllSetScreen";
-import { MobileContainer } from "@/components/MobileContainer";
+import { MobileContainer } from "@/components/shared/MobileContainer";
 
 export type OnboardingStep =
   | "welcome"

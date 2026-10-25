@@ -3,7 +3,7 @@
 import React, { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ServicesHubScreen } from "@/components/services/ServicesHubScreen";
-import { MobileContainer } from "@/components/MobileContainer";
+import { MobileContainer } from "@/components/shared/MobileContainer";
 
 function ServicesHubContent() {
   const router = useRouter();

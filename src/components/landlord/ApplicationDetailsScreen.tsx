@@ -14,8 +14,9 @@ import {
   Download,
   CheckCircle2,
 } from "lucide-react";
-import { MobileStatusBar } from "../MobileStatusBar";
-import { Button } from "@/components/ui/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { NotificationButton } from "@/components/shared/NotificationButton";
 import { LandlordBottomNav } from "./LandlordBottomNav";
 
 interface ApplicationDetailsScreenProps {
@@ -70,17 +71,13 @@ export function ApplicationDetailsScreen({
           Applications details
         </h1>
 
-        <Button
-          variant="icon"
-          size="icon-md"
+        <NotificationButton
+          size="md"
+          role="landlord"
+          dotColor="primary"
           onClick={onNavigateToNotifications}
-          aria-label="Notifications"
           prefetchHref="/landlord/notifications"
-          className="relative"
-        >
-          <Bell className="w-5 h-5 stroke-[1.8]" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-[#0891A2] rounded-full ring-2 ring-white" />
-        </Button>
+        />
       </div>
 
       {/* Main Scrollable Content */}

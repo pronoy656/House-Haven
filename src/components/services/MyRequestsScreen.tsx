@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Zap, Home, ClipboardList, User } from "lucide-react";
-import { MobileStatusBar } from "@/components/MobileStatusBar";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
 
 interface RequestItem {
   id: string;

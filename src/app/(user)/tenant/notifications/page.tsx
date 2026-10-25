@@ -3,7 +3,8 @@
 import React, { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Bell, Check, Clock } from "lucide-react";
-import { MobileContainer } from "@/components/MobileContainer";
+import { MobileContainer } from "@/components/shared/MobileContainer";
+import { ScreenHeader } from "@/components/shared/ScreenHeader";
 
 export default function TenantNotificationsPage() {
   const router = useRouter();
@@ -39,21 +40,15 @@ export default function TenantNotificationsPage() {
     <MobileContainer>
       <div className="relative w-full h-full max-h-[100dvh] bg-[#F8FAFC] flex flex-col justify-between text-slate-900 overflow-hidden select-none font-sans">
         
+        {/* Reusable Header */}
+        <ScreenHeader
+          title="Notifications"
+          backHref="/tenant/dashboard"
+          className="pt-4 pb-2"
+        />
+
         {/* Content */}
-        <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-4 pt-5 pb-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => router.push("/tenant/dashboard")}
-              className="w-9 h-9 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-900 shadow-2xs active:scale-95 cursor-pointer"
-            >
-              <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
-            </button>
-            <h1 className="text-[17px] font-bold text-slate-900 tracking-tight">
-              Notifications
-            </h1>
-            <div className="w-9 h-9" />
-          </div>
+        <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar px-4 pb-6 space-y-4">
 
           <div className="space-y-2.5">
             {notifications.map((item) => (

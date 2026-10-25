@@ -2,8 +2,9 @@
 
 import React, { useState } from "react";
 import { ArrowLeft, ChevronDown } from "lucide-react";
-import { MobileStatusBar } from "../MobileStatusBar";
-import { Button } from "../ui/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { InputField } from "@/components/shared/InputField";
 
 interface LandlordAddressScreenProps {
   onBack?: () => void;
@@ -74,22 +75,15 @@ export function LandlordAddressScreen({
 
         <div className="space-y-4">
           {/* Post Code */}
-          <div className="space-y-1.5 text-left">
-            <label className="text-[12px] font-medium text-slate-600 block">
-              Post code
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                value={postcode}
-                onChange={(e) => setPostcode(e.target.value)}
-                className="w-full h-11 px-3.5 pr-10 rounded-xl bg-[#F8FAFC] border border-slate-100 text-slate-800 text-[13px] font-medium focus:outline-none focus:ring-1 focus:ring-[#0891A2] focus:bg-white transition-all"
-              />
-              <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
-                <ChevronDown className="w-4 h-4" />
-              </div>
-            </div>
-          </div>
+          <InputField
+            label="Post code"
+            type="text"
+            variant="filled"
+            value={postcode}
+            onChange={(e) => setPostcode(e.target.value)}
+            rightIcon={<ChevronDown className="w-4 h-4 text-slate-400" />}
+            className="bg-[#F8FAFC] border-slate-100 text-slate-800 text-xs sm:text-[13px] font-medium rounded-xl h-11"
+          />
 
           {/* Select your address */}
           <div className="space-y-1.5 text-left relative">

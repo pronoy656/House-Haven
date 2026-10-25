@@ -28,6 +28,7 @@ export function HouseHavenLogo({
         height={height}
         priority
         className="object-contain h-auto"
+        style={{ width: "auto", height: "auto" }}
       />
     </div>
   );

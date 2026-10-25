@@ -2,8 +2,9 @@
 
 import React, { useState } from "react";
 import { ArrowLeft, Bell, Plus, Send } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { MobileStatusBar } from "@/components/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { InputField } from "@/components/shared/InputField";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
 import Image from "next/image";
 
 interface ServiceQuoteScreenProps {
@@ -103,6 +104,7 @@ export function ServiceQuoteScreen({
                   src="/splash-building.jpg"
                   alt="Property"
                   fill
+                  sizes="40px"
                   className="object-cover"
                 />
               </div>
@@ -198,12 +200,14 @@ export function ServiceQuoteScreen({
             <Plus className="w-5 h-5" />
           </button>
 
-          <input
+          <InputField
             type="text"
+            variant="outlined"
+            inputSize="sm"
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
-            placeholder=""
-            className="flex-1 h-10 px-4 bg-white border border-slate-200 rounded-2xl text-xs text-slate-800 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2] transition-all"
+            placeholder="Type your message..."
+            containerClassName="flex-1"
           />
 
           <button

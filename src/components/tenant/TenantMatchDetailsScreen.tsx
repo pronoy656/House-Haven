@@ -3,21 +3,18 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import {
-  Bell,
   Bed,
   Bath,
   Car,
   CalendarCheck,
   ShieldCheck,
-  LayoutGrid,
-  Search,
-  Repeat2,
-  Wrench,
-  User,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/shared/Button";
+import { NotificationButton } from "@/components/shared/NotificationButton";
+import { HeroBanner } from "@/components/shared/HeroBanner";
+import { Avatar } from "@/components/shared/Avatar";
 import { TenantBottomNav } from "./TenantBottomNav";
 
 interface TenantMatchDetailsScreenProps {
@@ -34,6 +31,14 @@ const PROPERTY_IMAGES = [
   "/great-georges-home.jpg",
   "/great-georges-interior.jpg",
   "/splash-livingroom-opt2.jpg",
+];
+
+const PROPERTY_TAGS = [
+  "Disabled Access",
+  "Garden",
+  "Furnished",
+  "Parking Available",
+  "Built 1960",
 ];
 
 export function TenantMatchDetailsScreen({
@@ -58,39 +63,22 @@ export function TenantMatchDetailsScreen({
       <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar">
 
         {/* 1. Top Hero Landscape Header */}
-        <div className="relative w-full h-[142px] overflow-hidden">
-          <Image
-            src="/tenant-matches-banner.png"
-            alt="Match Details"
-            fill
-            priority
-            sizes="(max-width: 480px) 100vw, 440px"
-            className="object-cover object-right-bottom"
-          />
-
-          {/* Left Gradient Overlay for text legibility */}
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-50/95 via-purple-50/70 to-transparent pointer-events-none" />
-
-          {/* Header Content */}
-          <div className="relative z-10 px-5 pt-4 flex items-center justify-between">
+        <HeroBanner
+          imageSrc="/tenant-matches-banner.png"
+          imageAlt="Match Details"
+          gradientOverlay="from-purple-50/95 via-purple-50/70 to-transparent"
+        >
+          <div className="px-5 pt-4 flex items-center justify-between">
             <h1 className="text-[19px] font-extrabold text-slate-900 tracking-tight leading-tight">
               Match Details
             </h1>
 
-            {/* Notification Bell */}
-            <Button
-              variant="icon"
-              size="icon-md"
+            <NotificationButton
               onClick={onNavigateToNotifications}
               prefetchHref="/tenant/notifications"
-              className="bg-white shadow-sm border border-slate-100 relative"
-              aria-label="Notifications"
-            >
-              <Bell className="w-5 h-5 stroke-[1.9] text-slate-800" />
-              <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white" />
-            </Button>
+            />
           </div>
-        </div>
+        </HeroBanner>
 
         {/* 2. Main Content Body */}
         <div className="px-5 pt-3 pb-8 space-y-4">
@@ -107,6 +95,7 @@ export function TenantMatchDetailsScreen({
                     src={img}
                     alt={`7 Great Georges Street photo ${idx + 1}`}
                     fill
+                    sizes="(max-width: 480px) 100vw, 440px"
                     priority={idx === 0}
                     className="object-cover"
                   />
@@ -183,13 +172,7 @@ export function TenantMatchDetailsScreen({
 
           {/* Feature Tags */}
           <div className="flex flex-wrap items-center gap-2">
-            {[
-              "Disabled Access",
-              "Garden",
-              "Furnished",
-              "Parking Available",
-              "Built 1960",
-            ].map((tag) => (
+            {PROPERTY_TAGS.map((tag) => (
               <span
                 key={tag}
                 className="px-3 py-1 rounded-full bg-[#E0F2FE]/70 text-[#0369A1] text-[11px] font-medium border border-sky-100/80"
@@ -215,15 +198,11 @@ export function TenantMatchDetailsScreen({
             onClick={onViewLandlordProfile}
             className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-100 shadow-2xs cursor-pointer hover:border-slate-200 transition-colors"
           >
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-200 relative shrink-0">
-              <Image
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
-                alt="Landlord Test"
-                fill
-                sizes="40px"
-                className="object-cover"
-              />
-            </div>
+            <Avatar
+              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
+              alt="Landlord Test"
+              size="md"
+            />
             <div>
               <h4 className="text-[13px] font-bold text-slate-900 leading-tight">
                 Landlord Test

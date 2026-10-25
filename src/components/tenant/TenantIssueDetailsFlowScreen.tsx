@@ -4,21 +4,18 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft,
-  Bell,
   Home,
   Calendar,
   Clock,
   AlertCircle,
   CheckCircle2,
-  ChevronRight,
-  RotateCcw,
-  Send,
-  Building2,
-  Check,
   User,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/shared/Button";
+import { ScreenHeader } from "@/components/shared/ScreenHeader";
+import { NotificationButton } from "@/components/shared/NotificationButton";
+import { Badge } from "@/components/shared/Badge";
+import { Avatar } from "@/components/shared/Avatar";
 import { TenantBottomNav } from "./TenantBottomNav";
 
 interface TimeSlot {
@@ -33,10 +30,37 @@ const TIME_SLOTS: TimeSlot[] = [
   { id: "slot-3", date: "Sep 22, 2026", time: "2:00–3:00 PM" },
 ];
 
+const TIMELINE_EVENTS = [
+  {
+    id: "times-proposed",
+    title: "Appointment times proposed",
+    date: "Sep 18, 2026 · 12:00 PM",
+    desc: "Three times sent. Tenant notified.",
+  },
+  {
+    id: "landlord-reviewed",
+    title: "Landlord reviewed the issue",
+    date: "Sep 18, 2026 · 11:50 AM",
+    desc: "A repair visit is being arranged.",
+  },
+  {
+    id: "update-requested",
+    title: "Update requested",
+    date: "Sep 15, 2026 · 11:00 AM",
+    desc: "Jerome Bell requested a repair update.",
+  },
+  {
+    id: "issue-reported",
+    title: "Issue reported",
+    date: "Sep 12, 2026 · 10:45 AM",
+    desc: "Kitchen Sink Leak submitted.",
+  },
+];
+
 export function TenantIssueDetailsFlowScreen() {
   const router = useRouter();
 
-  // Role toggle to see both Tenant view and Landlord view (Screen 4 from Frame)
+  // Role toggle to see both Tenant view and Landlord view
   const [viewMode, setViewMode] = useState<"tenant" | "landlord">("tenant");
 
   // Selection state
@@ -85,8 +109,8 @@ export function TenantIssueDetailsFlowScreen() {
         </div>
       )}
 
-      {/* View Mode Switcher Pill (Tenant vs Landlord View from Frame 4) */}
-      <div className="shrink-0 px-4 pt-3.5 pb-1.5 flex justify-center">
+      {/* View Mode Switcher Pill */}
+      <div className="shrink-0 px-4 pt-3 pb-1 flex justify-center">
         <div className="inline-flex bg-slate-200/80 p-0.5 rounded-full text-[10px] font-semibold gap-1">
           <Button
             type="button"
@@ -111,35 +135,22 @@ export function TenantIssueDetailsFlowScreen() {
         </div>
       </div>
 
+      {/* Header */}
+      <div className="px-4">
+        <ScreenHeader
+          title="Issue Details"
+          onBack={() => router.push("/tenant/maintenance")}
+          rightAction={
+            <NotificationButton
+              onClick={() => router.push("/tenant/notifications")}
+              prefetchHref="/tenant/notifications"
+            />
+          }
+        />
+      </div>
+
       {/* MAIN SCROLLABLE CONTENT */}
-      <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-4 pb-6 flex flex-col">
-
-        {/* Header */}
-        <div className="flex items-center justify-between mb-3.5">
-          <Button
-            variant="icon"
-            size="icon-sm"
-            onClick={() => router.push("/tenant/maintenance")}
-            prefetchHref="/tenant/maintenance"
-          >
-            <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
-          </Button>
-
-          <h1 className="text-[16.5px] font-bold text-slate-900 tracking-tight">
-            Issue Details
-          </h1>
-
-          <Button
-            variant="icon"
-            size="icon-sm"
-            onClick={() => router.push("/tenant/notifications")}
-            prefetchHref="/tenant/notifications"
-            className="relative"
-          >
-            <Bell className="w-4 h-4 stroke-[2]" />
-            <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#0891A2] rounded-full" />
-          </Button>
-        </div>
+      <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar px-4 pb-6 flex flex-col">
 
         {/* Hero Image Container with Dynamic Badge */}
         <div className="w-full h-44 rounded-2xl overflow-hidden relative mb-3 bg-slate-900 shadow-2xs">
@@ -147,6 +158,7 @@ export function TenantIssueDetailsFlowScreen() {
             src="/kitchen-sink-leak-real.png"
             alt="Kitchen Sink Leak"
             fill
+            sizes="(max-width: 480px) 100vw, 440px"
             className="object-cover"
             priority
           />
@@ -154,13 +166,13 @@ export function TenantIssueDetailsFlowScreen() {
           {/* Status Badge overlay on top-right */}
           <div className="absolute top-2.5 right-2.5">
             {appointmentStatus === "confirmed" && viewMode === "tenant" ? (
-              <span className="text-[9.5px] font-bold px-2.5 py-0.5 rounded-full bg-[#D1FAE5] text-[#059669] border border-[#A7F3D0] shadow-xs">
+              <Badge variant="success" size="xs">
                 Complete
-              </span>
+              </Badge>
             ) : (
-              <span className="text-[9.5px] font-bold px-2.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A] shadow-xs">
+              <Badge variant="warning" size="xs">
                 Pending repair
-              </span>
+              </Badge>
             )}
           </div>
         </div>
@@ -175,7 +187,7 @@ export function TenantIssueDetailsFlowScreen() {
           </p>
         </div>
 
-        {/* Property & Reporter Info Rows (Matching Frame) */}
+        {/* Property & Reporter Info Rows */}
         <div className="bg-white rounded-2xl p-3 border border-slate-100 shadow-2xs space-y-2.5 mb-4">
           {/* Property */}
           <div className="flex items-center gap-2.5">
@@ -198,14 +210,11 @@ export function TenantIssueDetailsFlowScreen() {
             <div className="flex items-center justify-between flex-1 text-xs">
               <span className="text-slate-400 font-medium">Reported by</span>
               <div className="flex items-center gap-1.5">
-                <div className="w-4 h-4 rounded-full overflow-hidden bg-slate-200 relative shrink-0">
-                  <Image
-                    src="/john-wick-avatar.jpg"
-                    alt="Jerome Bell"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+                <Avatar
+                  src="/john-wick-avatar.jpg"
+                  alt="Jerome Bell"
+                  size="xs"
+                />
                 <span className="text-slate-800 font-semibold">Jerome Bell</span>
               </div>
             </div>
@@ -319,7 +328,7 @@ export function TenantIssueDetailsFlowScreen() {
               </div>
             )}
 
-            {/* SUBCASE B: APPOINTMENT CONFIRMED (Screen 3) */}
+            {/* SUBCASE B: APPOINTMENT CONFIRMED */}
             {appointmentStatus === "confirmed" && (
               <div className="mb-5 space-y-3">
                 <h3 className="text-xs font-bold text-slate-900 tracking-tight">
@@ -354,9 +363,9 @@ export function TenantIssueDetailsFlowScreen() {
                         <span>{confirmedSlot?.time || "3:50–4:50 PM"}</span>
                       </div>
                     </div>
-                    <span className="text-[9.5px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
+                    <Badge variant="success" size="xs">
                       Confirmed
-                    </span>
+                    </Badge>
                   </div>
                 </div>
 
@@ -369,7 +378,7 @@ export function TenantIssueDetailsFlowScreen() {
         )}
 
         {/* ============================================================== */}
-        {/* VIEW 4: LANDLORD APPOINTMENT PROPOSALS SECTION (Screen 4)       */}
+        {/* VIEW 4: LANDLORD APPOINTMENT PROPOSALS SECTION                 */}
         {/* ============================================================== */}
         {viewMode === "landlord" && (
           <div className="mb-5 space-y-3">
@@ -400,11 +409,11 @@ export function TenantIssueDetailsFlowScreen() {
                   className="bg-white p-3 rounded-2xl border border-slate-100 shadow-2xs"
                 >
                   <div className="flex items-center gap-1.5 text-slate-800 font-bold text-xs">
-                    <Calendar className="w-3 h-3 text-slate-400" />
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
                     <span>{slot.date}</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-slate-500 font-medium text-[11px] mt-0.5">
-                    <Clock className="w-3 h-3 text-slate-400" />
+                    <Clock className="w-3.5 h-3.5 text-slate-400" />
                     <span>{slot.time}</span>
                   </div>
                 </div>
@@ -420,18 +429,20 @@ export function TenantIssueDetailsFlowScreen() {
               <p>No time has been confirmed by the tenant.</p>
             </div>
 
-            <button
+            <Button
               type="button"
+              variant="primary"
+              size="md"
+              fullWidth
               onClick={() => showToast("Status updated!")}
-              className="w-full py-3 rounded-full bg-[#0891A2] hover:bg-[#078090] text-white font-semibold text-xs transition-all shadow-xs cursor-pointer active:scale-[0.99] text-center"
             >
               Update Status
-            </button>
+            </Button>
           </div>
         )}
 
         {/* ============================================================== */}
-        {/* UPDATES & HISTORY (Vertical Timeline matching screenshots)      */}
+        {/* UPDATES & HISTORY (Timeline)                                   */}
         {/* ============================================================== */}
         <div className="mb-5">
           <h3 className="text-xs font-bold text-slate-900 tracking-tight">
@@ -458,61 +469,21 @@ export function TenantIssueDetailsFlowScreen() {
               </div>
             )}
 
-            {/* Event 1 */}
-            <div className="relative">
-              <span className="absolute -left-[27px] top-1 w-2.5 h-2.5 rounded-full bg-[#0891A2] ring-4 ring-teal-50" />
-              <h4 className="text-xs font-bold text-slate-800 leading-tight">
-                Appointment times proposed
-              </h4>
-              <p className="text-[9.5px] text-slate-400 mt-0.5">
-                Sep 18, 2026 · 12:00 PM
-              </p>
-              <p className="text-[10.5px] text-slate-500 mt-0.5">
-                Three times sent. Tenant notified.
-              </p>
-            </div>
-
-            {/* Event 2 */}
-            <div className="relative">
-              <span className="absolute -left-[27px] top-1 w-2.5 h-2.5 rounded-full bg-[#0891A2] ring-4 ring-teal-50" />
-              <h4 className="text-xs font-bold text-slate-800 leading-tight">
-                Landlord reviewed the issue
-              </h4>
-              <p className="text-[9.5px] text-slate-400 mt-0.5">
-                Sep 18, 2026 · 11:50 AM
-              </p>
-              <p className="text-[10.5px] text-slate-500 mt-0.5">
-                A repair visit is being arranged.
-              </p>
-            </div>
-
-            {/* Event 3 */}
-            <div className="relative">
-              <span className="absolute -left-[27px] top-1 w-2.5 h-2.5 rounded-full bg-[#0891A2] ring-4 ring-teal-50" />
-              <h4 className="text-xs font-bold text-slate-800 leading-tight">
-                Update requested
-              </h4>
-              <p className="text-[9.5px] text-slate-400 mt-0.5">
-                Sep 15, 2026 · 11:00 AM
-              </p>
-              <p className="text-[10.5px] text-slate-500 mt-0.5">
-                Jerome Bell requested a repair update.
-              </p>
-            </div>
-
-            {/* Event 4 */}
-            <div className="relative">
-              <span className="absolute -left-[27px] top-1 w-2.5 h-2.5 rounded-full bg-[#0891A2] ring-4 ring-teal-50" />
-              <h4 className="text-xs font-bold text-slate-800 leading-tight">
-                Issue reported
-              </h4>
-              <p className="text-[9.5px] text-slate-400 mt-0.5">
-                Sep 12, 2026 · 10:45 AM
-              </p>
-              <p className="text-[10.5px] text-slate-500 mt-0.5">
-                Kitchen Sink Leak submitted.
-              </p>
-            </div>
+            {/* Mapped timeline events */}
+            {TIMELINE_EVENTS.map((event) => (
+              <div key={event.id} className="relative">
+                <span className="absolute -left-[27px] top-1 w-2.5 h-2.5 rounded-full bg-[#0891A2] ring-4 ring-teal-50" />
+                <h4 className="text-xs font-bold text-slate-800 leading-tight">
+                  {event.title}
+                </h4>
+                <p className="text-[9.5px] text-slate-400 mt-0.5">
+                  {event.date}
+                </p>
+                <p className="text-[10.5px] text-slate-500 mt-0.5">
+                  {event.desc}
+                </p>
+              </div>
+            ))}
           </div>
 
           {/* Action button below timeline */}
@@ -548,7 +519,7 @@ export function TenantIssueDetailsFlowScreen() {
         </div>
 
         {/* ============================================================== */}
-        {/* MESSAGES SECTION (Matching Frame)                              */}
+        {/* MESSAGES SECTION                                               */}
         {/* ============================================================== */}
         <div className="mb-4">
           <h3 className="text-xs font-bold text-slate-900 tracking-tight mb-2">
@@ -566,7 +537,7 @@ export function TenantIssueDetailsFlowScreen() {
               </p>
             </div>
 
-            {/* Tenant Message (Appears when confirmed, Screen 3 & 4) */}
+            {/* Tenant Message */}
             {appointmentStatus === "confirmed" && (
               <div className="bg-[#F0FDFA] rounded-2xl p-3 border border-teal-100 shadow-2xs animate-in fade-in duration-200">
                 <h4 className="text-[11px] font-bold text-[#0891A2] leading-tight">
@@ -582,9 +553,7 @@ export function TenantIssueDetailsFlowScreen() {
 
       </div>
 
-      {/* ============================================================== */}
-      {/* BOTTOM NAVIGATION BAR (Standardized reusable component)        */}
-      {/* ============================================================== */}
+      {/* BOTTOM NAVIGATION BAR */}
       <TenantBottomNav activeTab="maintenance" />
 
     </div>

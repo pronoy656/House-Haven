@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { MobileContainer } from "@/components/MobileContainer";
+import { MobileContainer } from "@/components/shared/MobileContainer";
 import { TenantBoostScreen } from "@/components/tenant/TenantBoostScreen";
 
 export default function TenantBoostPage() {

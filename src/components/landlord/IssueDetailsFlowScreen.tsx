@@ -15,8 +15,9 @@ import {
   UploadCloud,
   X,
 } from "lucide-react";
-import { MobileStatusBar } from "../MobileStatusBar";
-import { Button } from "../ui/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { InputField } from "@/components/shared/InputField";
 import { LandlordBottomNav } from "./LandlordBottomNav";
 
 export type IssueFlowView =
@@ -139,6 +140,7 @@ export function IssueDetailsFlowScreen({
                 src={thumbnails[currentThumbIndex]}
                 alt="Issue Living Room / Faucet"
                 fill
+                sizes="(max-width: 480px) 100vw, 440px"
                 className="object-cover"
                 priority
               />
@@ -500,22 +502,16 @@ export function IssueDetailsFlowScreen({
             </div>
 
             {/* Select Time Section */}
-            <div className="space-y-1.5">
-              <h3 className="text-[14px] font-bold text-slate-900">
-                Select Time
-              </h3>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <Clock className="w-4 h-4" />
-                </div>
-                <input
-                  type="text"
-                  value={selectedTime}
-                  onChange={(e) => setSelectedTime(e.target.value)}
-                  className="w-full h-11 pl-10 pr-4 rounded-xl bg-[#F8FAFC] border border-slate-100 text-slate-800 text-[13px] font-medium focus:outline-none focus:ring-1 focus:ring-[#0891A2] focus:bg-white"
-                />
-              </div>
-            </div>
+            <InputField
+              label="Select Time"
+              labelClassName="text-[14px] font-bold text-slate-900"
+              type="text"
+              variant="filled"
+              leftIcon={<Clock className="w-4 h-4 text-slate-400" />}
+              value={selectedTime}
+              onChange={(e) => setSelectedTime(e.target.value)}
+              className="bg-[#F8FAFC] border-slate-100 text-slate-800 text-[13px] font-medium rounded-xl h-11"
+            />
 
             {/* Book Appointment Button */}
             <div className="pt-2">

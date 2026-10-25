@@ -3,7 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { LayoutGrid, Building, FileText, MessageSquareMore, User } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/shared/Button";
 
 export type LandlordNavTab = "dashboard" | "properties" | "applications" | "messages" | "profile";
 

@@ -15,9 +15,11 @@ import {
   Wrench,
   MessageCircle,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/shared/Button";
+import { NotificationButton } from "@/components/shared/NotificationButton";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Avatar } from "@/components/shared/Avatar";
 import { LandlordBottomNav } from "./LandlordBottomNav";
-import { MobileStatusBar } from "../MobileStatusBar";
 
 interface LandlordDashboardScreenProps {
   onSignOut?: () => void;
@@ -62,30 +64,20 @@ export function LandlordDashboardScreen({
         </div>
 
         <div className="flex items-center gap-3">
-          <Button
-            variant="icon"
-            size="icon-sm"
+          <NotificationButton
+            size="sm"
+            role="landlord"
+            dotColor="primary"
             onClick={onNavigateToNotifications}
             prefetchHref="/landlord/notifications"
-            className="w-9 h-9 rounded-full relative"
-            aria-label="Notifications"
-          >
-            <Bell className="w-5 h-5 stroke-[1.8]" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#0891A2] rounded-full ring-2 ring-white" />
-          </Button>
+          />
 
           {/* Profile Avatar */}
-          <div
-            onClick={onNavigateToProfile}
-            className="w-10 h-10 rounded-full overflow-hidden bg-slate-200 ring-1 ring-slate-200 shrink-0 cursor-pointer hover:opacity-90 transition-opacity relative"
-            title="Profile"
-          >
-            <Image
+          <div onClick={onNavigateToProfile} className="cursor-pointer">
+            <Avatar
               src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80"
               alt="John Smith"
-              fill
-              sizes="40px"
-              className="object-cover"
+              size="md"
             />
           </div>
         </div>

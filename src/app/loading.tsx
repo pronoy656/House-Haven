@@ -1,5 +1,5 @@
 import React from "react";
-import { MobileContainer } from "@/components/MobileContainer";
+import { MobileContainer } from "@/components/shared/MobileContainer";
 
 export default function Loading() {
   return (

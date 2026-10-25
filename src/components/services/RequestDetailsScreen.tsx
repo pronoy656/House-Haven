@@ -11,7 +11,7 @@ import {
   ClipboardList,
   User,
 } from "lucide-react";
-import { MobileStatusBar } from "@/components/MobileStatusBar";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
 
 interface RequestDetailsScreenProps {
   onBack?: () => void;

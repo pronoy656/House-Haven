@@ -2,7 +2,7 @@
 
 import React, { Suspense } from "react";
 import { TenantIssueDetailsFlowScreen } from "@/components/tenant/TenantIssueDetailsFlowScreen";
-import { MobileContainer } from "@/components/MobileContainer";
+import { MobileContainer } from "@/components/shared/MobileContainer";
 
 export default function TenantIssueDetailsPage() {
   return (

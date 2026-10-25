@@ -25,8 +25,10 @@ import {
   CheckCircle2,
   LogOut,
 } from "lucide-react";
-import { MobileStatusBar } from "../MobileStatusBar";
-import { Button } from "../ui/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { InputField } from "@/components/shared/InputField";
+import { NotificationButton } from "@/components/shared/NotificationButton";
 import { LandlordBottomNav } from "./LandlordBottomNav";
 
 export type ProfileFlowView =
@@ -184,15 +186,13 @@ export function LandlordProfileFlowScreen({
           {currentView === "create_new_password" && "Create a New Password"}
         </h1>
 
-        <button
-          type="button"
+        <NotificationButton
+          size="sm"
+          role="landlord"
+          dotColor="primary"
           onClick={onNavigateToNotifications}
-          className="w-9 h-9 rounded-full flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer relative"
-          title="Notifications"
-        >
-          <Bell className="w-5 h-5 stroke-[1.8]" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#0891A2] rounded-full ring-2 ring-white" />
-        </button>
+          prefetchHref="/landlord/notifications"
+        />
       </div>
 
       {/* Scrollable Content Body */}
@@ -252,51 +252,49 @@ export function LandlordProfileFlowScreen({
             {/* Form Fields */}
             <form onSubmit={handleSaveProfile} className="space-y-3">
               {/* Full Name */}
-              <div className="space-y-1">
-                <label className="text-[11.5px] font-medium text-slate-500">Full Name</label>
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2]"
-                />
-              </div>
+              <InputField
+                label="Full Name"
+                labelClassName="text-[11.5px] font-medium text-slate-500"
+                type="text"
+                variant="outlined"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="h-11 rounded-xl text-xs font-semibold"
+              />
 
               {/* Date of Birth */}
-              <div className="space-y-1">
-                <label className="text-[11.5px] font-medium text-slate-500">Date of Birth</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={dob}
-                    onChange={(e) => setDob(e.target.value)}
-                    className="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2]"
-                  />
-                  <Calendar className="absolute right-3.5 top-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
-                </div>
-              </div>
+              <InputField
+                label="Date of Birth"
+                labelClassName="text-[11.5px] font-medium text-slate-500"
+                type="text"
+                variant="outlined"
+                rightIcon={<Calendar className="w-4 h-4 text-slate-400" />}
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
+                className="h-11 rounded-xl text-xs font-semibold"
+              />
 
               {/* Phone Number */}
-              <div className="space-y-1">
-                <label className="text-[11.5px] font-medium text-slate-500">Phone Number</label>
-                <input
-                  type="text"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2]"
-                />
-              </div>
+              <InputField
+                label="Phone Number"
+                labelClassName="text-[11.5px] font-medium text-slate-500"
+                type="tel"
+                variant="outlined"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="h-11 rounded-xl text-xs font-semibold"
+              />
 
               {/* E-mail */}
-              <div className="space-y-1">
-                <label className="text-[11.5px] font-medium text-slate-500">E-mail</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2]"
-                />
-              </div>
+              <InputField
+                label="E-mail"
+                labelClassName="text-[11.5px] font-medium text-slate-500"
+                type="email"
+                variant="outlined"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-11 rounded-xl text-xs font-semibold"
+              />
 
               {/* Post code */}
               <div className="space-y-1">
@@ -653,25 +651,16 @@ export function LandlordProfileFlowScreen({
 
             <div className="space-y-3">
               {/* Current Password */}
-              <div className="space-y-1">
-                <label className="text-[11.5px] font-medium text-slate-500">Current Password</label>
-                <div className="relative">
-                  <input
-                    type={showCurrentPassword ? "text" : "password"}
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="Enter your current password"
-                    className="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-200 text-xs font-medium text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600"
-                  >
-                    {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
+              <InputField
+                label="Current Password"
+                labelClassName="text-[11.5px] font-medium text-slate-500"
+                type="password"
+                variant="outlined"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Enter your current password"
+                className="h-11 rounded-xl text-xs font-medium"
+              />
 
               {/* Requirement Checkpoints */}
               <div className="space-y-1 text-[11px] text-emerald-600 font-medium">
@@ -686,46 +675,28 @@ export function LandlordProfileFlowScreen({
               </div>
 
               {/* New Password */}
-              <div className="space-y-1">
-                <label className="text-[11.5px] font-medium text-slate-500">New Password</label>
-                <div className="relative">
-                  <input
-                    type={showNewPassword ? "text" : "password"}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-200 text-xs font-medium text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600"
-                  >
-                    {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
+              <InputField
+                label="New Password"
+                labelClassName="text-[11.5px] font-medium text-slate-500"
+                type="password"
+                variant="outlined"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter your password"
+                className="h-11 rounded-xl text-xs font-medium"
+              />
 
               {/* Confirm New Password */}
-              <div className="space-y-1">
-                <label className="text-[11.5px] font-medium text-slate-500">Confirm New Password</label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-200 text-xs font-medium text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
+              <InputField
+                label="Confirm New Password"
+                labelClassName="text-[11.5px] font-medium text-slate-500"
+                type="password"
+                variant="outlined"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Enter your password"
+                className="h-11 rounded-xl text-xs font-medium"
+              />
 
               {/* Submit Button */}
               <div className="pt-2">
@@ -761,16 +732,16 @@ export function LandlordProfileFlowScreen({
             </div>
 
             {/* Email Field */}
-            <div className="space-y-1">
-              <label className="text-[11.5px] font-medium text-slate-500">E-mail</label>
-              <input
-                type="email"
-                value={forgotEmail}
-                onChange={(e) => setForgotEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2]"
-              />
-            </div>
+            <InputField
+              label="E-mail"
+              labelClassName="text-[11.5px] font-medium text-slate-500"
+              type="email"
+              variant="outlined"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              placeholder="Enter your email"
+              className="h-11 rounded-xl text-xs font-semibold"
+            />
 
             {/* Send Code Button */}
             <div className="pt-2">
@@ -801,7 +772,7 @@ export function LandlordProfileFlowScreen({
             {/* 4 Digit Boxes */}
             <div className="flex items-center justify-center gap-3 pt-2">
               {otpDigits.map((digit, idx) => (
-                <input
+                <InputField
                   key={idx}
                   type="text"
                   maxLength={1}
@@ -811,7 +782,8 @@ export function LandlordProfileFlowScreen({
                     newOtp[idx] = e.target.value;
                     setOtpDigits(newOtp);
                   }}
-                  className="w-13 h-13 text-center text-lg font-bold text-slate-900 rounded-2xl border border-slate-200 bg-[#F8FAFC] focus:outline-none focus:border-[#0891A2] focus:bg-white focus:ring-1 focus:ring-[#0891A2]"
+                  containerClassName="w-13"
+                  className="w-13 h-13 text-center text-lg font-bold rounded-2xl bg-[#F8FAFC] border-slate-200 px-0"
                 />
               ))}
             </div>
@@ -854,46 +826,28 @@ export function LandlordProfileFlowScreen({
 
             <div className="space-y-3 pt-1">
               {/* New Password */}
-              <div className="space-y-1">
-                <label className="text-[11.5px] font-medium text-slate-500">New Password</label>
-                <div className="relative">
-                  <input
-                    type={showNewPassword ? "text" : "password"}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter new password"
-                    className="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-200 text-xs font-medium text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600"
-                  >
-                    {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
+              <InputField
+                label="New Password"
+                labelClassName="text-[11.5px] font-medium text-slate-500"
+                type="password"
+                variant="outlined"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter new password"
+                className="h-11 rounded-xl text-xs font-medium"
+              />
 
               {/* Confirm Password */}
-              <div className="space-y-1">
-                <label className="text-[11.5px] font-medium text-slate-500">Confirm Password</label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm your password"
-                    className="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-200 text-xs font-medium text-slate-900 focus:outline-none focus:border-[#0891A2] focus:ring-1 focus:ring-[#0891A2]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
+              <InputField
+                label="Confirm Password"
+                labelClassName="text-[11.5px] font-medium text-slate-500"
+                type="password"
+                variant="outlined"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
+                className="h-11 rounded-xl text-xs font-medium"
+              />
 
               {/* Continue Button */}
               <div className="pt-2">

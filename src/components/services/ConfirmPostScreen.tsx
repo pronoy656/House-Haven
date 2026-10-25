@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { ArrowLeft, Home, Calendar, FileText, Zap, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { MobileStatusBar } from "@/components/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
 import Image from "next/image";
 
 interface ConfirmPostScreenProps {

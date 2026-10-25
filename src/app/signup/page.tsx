@@ -3,7 +3,7 @@
 import React, { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SignUpScreen } from "@/components/SignUpScreen";
-import { MobileContainer } from "@/components/MobileContainer";
+import { MobileContainer } from "@/components/shared/MobileContainer";
 
 function SignUpContent() {
   const router = useRouter();

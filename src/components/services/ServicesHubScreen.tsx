@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { MobileStatusBar } from "@/components/MobileStatusBar";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { InputField } from "@/components/shared/InputField";
 import {
   Bell,
   Search,
@@ -155,16 +156,14 @@ export function ServicesHubScreen({
       <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar px-5 py-3 space-y-4 text-left">
 
         {/* Search Bar */}
-        <div className="relative flex items-center">
-          <Search className="absolute left-4 w-4 h-4 text-slate-400 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search..."
-            className="w-full h-12 pl-11 pr-4 bg-[#F4F6F9] text-slate-900 placeholder:text-slate-400 rounded-2xl text-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0891A2] border border-transparent transition-all"
-          />
-        </div>
+        <InputField
+          type="text"
+          variant="filled"
+          leftIcon={<Search className="w-4 h-4 text-slate-400" />}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search..."
+        />
 
         {/* Featured Banner: Trusted Property Services */}
         <div className="relative overflow-hidden rounded-[14px] bg-[#EFEBFD] p-4 flex items-center justify-between gap-2">
@@ -185,6 +184,7 @@ export function ServicesHubScreen({
               src="/png-1.png"
               alt="Trusted Property Services"
               fill
+              sizes="128px"
               className="object-contain object-right"
               priority
             />

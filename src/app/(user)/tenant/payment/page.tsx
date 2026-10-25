@@ -2,7 +2,7 @@
 
 import React, { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { MobileContainer } from "@/components/MobileContainer";
+import { MobileContainer } from "@/components/shared/MobileContainer";
 import { TenantPaymentScreen } from "@/components/tenant/TenantPaymentScreen";
 
 function PaymentContent() {

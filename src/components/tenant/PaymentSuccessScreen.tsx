@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Check, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/shared/Button";
 
 interface PaymentSuccessScreenProps {
   planTitle?: string;

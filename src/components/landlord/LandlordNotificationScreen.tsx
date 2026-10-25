@@ -14,8 +14,8 @@ import {
   Clock,
   Sparkles,
 } from "lucide-react";
-import { MobileStatusBar } from "../MobileStatusBar";
-import { Button } from "@/components/ui/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
 import { LandlordBottomNav } from "./LandlordBottomNav";
 
 export interface NotificationItem {

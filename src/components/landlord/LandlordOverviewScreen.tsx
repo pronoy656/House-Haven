@@ -2,8 +2,8 @@
 
 import React from "react";
 import { ArrowLeft, User, Mail, Phone, MapPin, CheckCircle2 } from "lucide-react";
-import { MobileStatusBar } from "../MobileStatusBar";
-import { Button } from "../ui/Button";
+import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { Button } from "@/components/shared/Button";
 
 interface LandlordOverviewScreenProps {
   onBack?: () => void;
