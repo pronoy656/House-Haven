@@ -33,7 +33,7 @@ export function SettingsView() {
   return (
     <div className="w-full flex flex-col min-h-screen bg-slate-50">
       {/* Top Header */}
-      <header className="bg-white border-b border-slate-200 px-6 md:px-8 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sticky top-0 z-30 shadow-2xs w-full">
+      <header className="bg-white border-b border-slate-200 px-4 sm:px-6 md:px-8 py-3.5 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 static md:sticky md:top-0 md:z-30 shadow-2xs w-full">
         <div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">Platform Settings</h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -50,7 +50,7 @@ export function SettingsView() {
       </header>
 
       {/* Main Body */}
-      <main className="p-6 md:p-8 space-y-6 flex-1 w-full max-w-4xl">
+      <main className="p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 flex-1 w-full max-w-4xl">
         <form onSubmit={handleSave} className="space-y-6">
           {/* Section 1: Fee Structure */}
           <div className="bg-white border border-slate-200 rounded-2xl shadow-2xs p-6 space-y-4">

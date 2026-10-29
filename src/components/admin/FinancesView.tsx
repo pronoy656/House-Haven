@@ -82,7 +82,7 @@ export function FinancesView() {
   return (
     <div className="w-full flex flex-col min-h-screen bg-slate-50">
       {/* Top Header */}
-      <header className="bg-white border-b border-slate-200 px-6 md:px-8 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sticky top-0 z-30 shadow-2xs w-full">
+      <header className="bg-white border-b border-slate-200 px-4 sm:px-6 md:px-8 py-3.5 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 static md:sticky md:top-0 md:z-30 shadow-2xs w-full">
         <div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">Finances &amp; Transactions</h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -105,9 +105,9 @@ export function FinancesView() {
       </header>
 
       {/* Main Body */}
-      <main className="p-6 md:p-8 space-y-6 flex-1 w-full max-w-full">
+      <main className="p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 flex-1 w-full max-w-full">
         {/* 4 Stat Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
           <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -224,9 +224,14 @@ export function FinancesView() {
             </div>
           </div>
 
+          {/* Mobile Swipe Hint */}
+          <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between sm:hidden text-[11px] text-slate-500 font-medium">
+            <span>← Swipe table horizontally to see all columns →</span>
+          </div>
+
           {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left border-collapse min-w-[850px]">
               <thead>
                 <tr className="bg-slate-50/90 text-slate-600 font-bold text-xs uppercase tracking-wider border-b border-slate-200">
                   <th className="py-4 px-5">Ref &amp; Type</th>

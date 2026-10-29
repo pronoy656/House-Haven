@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   Users,
   Search,
@@ -48,8 +49,15 @@ export function UsersView({
   const [searchQuery, setSearchQuery] = useState("");
   const [verificationFilter, setVerificationFilter] = useState<string>("All");
 
-  // Three-dot Action Menu State
-  const [activeMenuUserId, setActiveMenuUserId] = useState<string | null>(null);
+  // Portal mount check
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Three-dot Action Menu State with Fixed Coordinates (Portal)
+  const [activeMenuUser, setActiveMenuUser] = useState<AdminUser | null>(null);
+  const [menuCoords, setMenuCoords] = useState<{ top: number; right: number } | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   // Selected User Modal State
@@ -60,16 +68,48 @@ export function UsersView({
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
 
-  // Click outside listener for three-dot menu
+  // Toggle Dropdown with Smart Position
+  const handleToggleMenu = (e: React.MouseEvent<HTMLButtonElement>, user: AdminUser) => {
+    e.stopPropagation();
+    if (activeMenuUser?.id === user.id) {
+      setActiveMenuUser(null);
+      setMenuCoords(null);
+    } else {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const menuHeight = 165;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const showAbove = spaceBelow < menuHeight && rect.top > menuHeight;
+
+      setMenuCoords({
+        top: showAbove ? rect.top - menuHeight - 4 : rect.bottom + 4,
+        right: Math.max(12, window.innerWidth - rect.right),
+      });
+      setActiveMenuUser(user);
+    }
+  };
+
+  // Click outside and scroll/resize listener to close menu
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setActiveMenuUserId(null);
+    const handleClose = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setActiveMenuUser(null);
+        setMenuCoords(null);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
+
+    const handleScrollOrResize = () => {
+      setActiveMenuUser(null);
+      setMenuCoords(null);
+    };
+
+    document.addEventListener("mousedown", handleClose);
+    window.addEventListener("scroll", handleScrollOrResize, true);
+    window.addEventListener("resize", handleScrollOrResize);
+
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClose);
+      window.removeEventListener("scroll", handleScrollOrResize, true);
+      window.removeEventListener("resize", handleScrollOrResize);
     };
   }, []);
 
@@ -122,7 +162,8 @@ export function UsersView({
         u.id === id ? { ...u, verificationStatus: "Verified" as const } : u
       )
     );
-    setActiveMenuUserId(null);
+    setActiveMenuUser(null);
+    setMenuCoords(null);
   };
 
   const handleToggleStatus = (id: string) => {
@@ -136,13 +177,15 @@ export function UsersView({
           : u
       )
     );
-    setActiveMenuUserId(null);
+    setActiveMenuUser(null);
+    setMenuCoords(null);
   };
 
   const handleOpenDetails = (user: AdminUser) => {
     setSelectedUser(user);
     setIsModalOpen(true);
-    setActiveMenuUserId(null);
+    setActiveMenuUser(null);
+    setMenuCoords(null);
   };
 
   const getRoleBadge = (role: AdminUser["role"]) => {
@@ -159,7 +202,7 @@ export function UsersView({
   return (
     <div className="w-full flex flex-col min-h-screen bg-slate-50">
       {/* Top Header */}
-      <header className="bg-white border-b border-slate-200 px-6 md:px-8 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sticky top-0 z-30 shadow-2xs w-full">
+      <header className="bg-white border-b border-slate-200 px-4 sm:px-6 md:px-8 py-3.5 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 static md:sticky md:top-0 md:z-30 shadow-2xs w-full">
         <div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">{title}</h1>
           <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>
@@ -180,9 +223,9 @@ export function UsersView({
       </header>
 
       {/* Main Body */}
-      <main className="p-6 md:p-8 space-y-6 flex-1 w-full max-w-full">
+      <main className="p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 flex-1 w-full max-w-full">
         {/* 4 Stat Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
           <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -275,9 +318,14 @@ export function UsersView({
             </div>
           </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          {/* Mobile Swipe Hint */}
+          <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between sm:hidden text-[11px] text-slate-500 font-medium">
+            <span>← Swipe table horizontally to see all columns →</span>
+          </div>
+
+          {/* Table with Horizontal Scroll */}
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left border-collapse min-w-[850px]">
               <thead>
                 <tr className="bg-slate-50/90 text-slate-600 font-bold text-xs uppercase tracking-wider border-b border-slate-200">
                   <th className="py-4 px-5">User &amp; Contact</th>
@@ -369,18 +417,13 @@ export function UsersView({
                         </span>
                       </td>
 
-                      {/* Action Column with Three-Dot Icon & Dropdown Menu */}
-                      <td className="py-4 px-5 text-right relative">
+                      {/* Action Column with Three-Dot Icon (Opens unclipped Portal Menu) */}
+                      <td className="py-4 px-5 text-right">
                         <button
                           type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveMenuUserId(
-                              activeMenuUserId === user.id ? null : user.id
-                            );
-                          }}
+                          onClick={(e) => handleToggleMenu(e, user)}
                           className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer ml-auto ${
-                            activeMenuUserId === user.id
+                            activeMenuUser?.id === user.id
                               ? "bg-slate-200 text-slate-900"
                               : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
                           }`}
@@ -388,60 +431,6 @@ export function UsersView({
                         >
                           <MoreVertical className="w-4 h-4" />
                         </button>
-
-                        {/* Dropdown Menu */}
-                        {activeMenuUserId === user.id && (
-                          <div
-                            ref={menuRef}
-                            className="absolute right-5 top-12 z-50 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 min-w-[175px] text-left animate-in fade-in zoom-in-95 duration-100"
-                          >
-                            <button
-                              type="button"
-                              onClick={() => handleOpenDetails(user)}
-                              className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 flex items-center gap-2 cursor-pointer transition-colors"
-                            >
-                              <Eye className="w-3.5 h-3.5 text-slate-500" />
-                              <span>View Profile</span>
-                            </button>
-
-                            {user.verificationStatus === "Pending ID" && (
-                              <button
-                                type="button"
-                                onClick={() => handleVerify(user.id)}
-                                className="w-full px-3.5 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 flex items-center gap-2 cursor-pointer transition-colors"
-                              >
-                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                                <span>Approve ID</span>
-                              </button>
-                            )}
-
-                            <a
-                              href={`mailto:${user.email}`}
-                              onClick={() => setActiveMenuUserId(null)}
-                              className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 flex items-center gap-2 cursor-pointer transition-colors"
-                            >
-                              <Mail className="w-3.5 h-3.5 text-slate-500" />
-                              <span>Send Email</span>
-                            </a>
-
-                            <div className="border-t border-slate-100 my-1" />
-
-                            <button
-                              type="button"
-                              onClick={() => handleToggleStatus(user.id)}
-                              className={`w-full px-3.5 py-2 text-xs font-semibold flex items-center gap-2 cursor-pointer transition-colors ${
-                                user.status === "Active"
-                                  ? "text-rose-600 hover:bg-rose-50"
-                                  : "text-emerald-600 hover:bg-emerald-50"
-                              }`}
-                            >
-                              <UserX className="w-3.5 h-3.5" />
-                              <span>
-                                {user.status === "Active" ? "Suspend User" : "Activate User"}
-                              </span>
-                            </button>
-                          </div>
-                        )}
                       </td>
                     </tr>
                   ))
@@ -478,6 +467,71 @@ export function UsersView({
           </div>
         </div>
       </main>
+
+      {/* Floating Action Dropdown Menu Mounted via React Portal (Never clipped by table overflow) */}
+      {mounted && activeMenuUser && menuCoords && createPortal(
+        <div
+          ref={menuRef}
+          style={{
+            position: "fixed",
+            top: `${menuCoords.top}px`,
+            right: `${menuCoords.right}px`,
+            zIndex: 99999,
+          }}
+          className="bg-white border border-slate-200 rounded-xl shadow-2xl py-1.5 min-w-[175px] text-left animate-in fade-in zoom-in-95 duration-100"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={() => handleOpenDetails(activeMenuUser)}
+            className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 flex items-center gap-2 cursor-pointer transition-colors"
+          >
+            <Eye className="w-3.5 h-3.5 text-slate-500" />
+            <span>View Profile</span>
+          </button>
+
+          {activeMenuUser.verificationStatus === "Pending ID" && (
+            <button
+              type="button"
+              onClick={() => handleVerify(activeMenuUser.id)}
+              className="w-full px-3.5 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 flex items-center gap-2 cursor-pointer transition-colors"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Approve ID</span>
+            </button>
+          )}
+
+          <a
+            href={`mailto:${activeMenuUser.email}`}
+            onClick={() => {
+              setActiveMenuUser(null);
+              setMenuCoords(null);
+            }}
+            className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 flex items-center gap-2 cursor-pointer transition-colors"
+          >
+            <Mail className="w-3.5 h-3.5 text-slate-500" />
+            <span>Send Email</span>
+          </a>
+
+          <div className="border-t border-slate-100 my-1" />
+
+          <button
+            type="button"
+            onClick={() => handleToggleStatus(activeMenuUser.id)}
+            className={`w-full px-3.5 py-2 text-xs font-semibold flex items-center gap-2 cursor-pointer transition-colors ${
+              activeMenuUser.status === "Active"
+                ? "text-rose-600 hover:bg-rose-50"
+                : "text-emerald-600 hover:bg-emerald-50"
+            }`}
+          >
+            <UserX className="w-3.5 h-3.5" />
+            <span>
+              {activeMenuUser.status === "Active" ? "Suspend User" : "Activate User"}
+            </span>
+          </button>
+        </div>,
+        document.body
+      )}
 
       {/* User Details Modal */}
       {isModalOpen && selectedUser && (

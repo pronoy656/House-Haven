@@ -49,10 +49,21 @@ export function AdminSidebar({ pendingCount = 4 }: AdminSidebarProps) {
     }
   }, [isUsersActive]);
 
-  // Close mobile menu on route change
+  // Close mobile menu on route change & prevent background scroll when drawer is open
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
 
   const isFinancesActive = pathname.startsWith("/admin/finances");
   const isSettingsActive = pathname.startsWith("/admin/settings");
@@ -60,7 +71,7 @@ export function AdminSidebar({ pendingCount = 4 }: AdminSidebarProps) {
   const navigationContent = (
     <>
       {/* Brand Header */}
-      <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+      <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-1.5 shadow-2xs">
             <HouseHavenLogo width={28} height={36} variant="light" />
@@ -79,7 +90,7 @@ export function AdminSidebar({ pendingCount = 4 }: AdminSidebarProps) {
         {/* Close button for mobile drawer */}
         <button
           onClick={() => setIsMobileMenuOpen(false)}
-          className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+          className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
           aria-label="Close navigation"
         >
           <X className="w-5 h-5" />
@@ -260,7 +271,7 @@ export function AdminSidebar({ pendingCount = 4 }: AdminSidebarProps) {
       </nav>
 
       {/* User Card */}
-      <div className="p-4 border-t border-slate-100 flex items-center gap-3 bg-slate-50/60">
+      <div className="p-4 border-t border-slate-100 flex items-center gap-3 bg-slate-50/60 shrink-0">
         <div className="w-9 h-9 rounded-full bg-[#0891A2] text-white font-bold flex items-center justify-center text-xs shadow-2xs">
           AD
         </div>
@@ -274,15 +285,15 @@ export function AdminSidebar({ pendingCount = 4 }: AdminSidebarProps) {
 
   return (
     <>
-      {/* Mobile Top Header Bar with Hamburger Button */}
-      <div className="md:hidden w-full bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-2xs">
+      {/* Mobile Top Navbar with Hamburger Toggle */}
+      <header className="md:hidden w-full bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-xs">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center p-1">
             <HouseHavenLogo width={22} height={28} variant="light" />
           </div>
           <div className="flex items-center gap-1.5">
             <span className="font-bold text-slate-900 text-sm">HouseHaven</span>
-            <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#0891A2] text-white rounded uppercase">
+            <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#0891A2] text-white rounded uppercase tracking-wider">
               Admin
             </span>
           </div>
@@ -290,30 +301,30 @@ export function AdminSidebar({ pendingCount = 4 }: AdminSidebarProps) {
 
         <button
           onClick={() => setIsMobileMenuOpen(true)}
-          className="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
-          aria-label="Open navigation menu"
+          className="w-9 h-9 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
+          aria-label="Open sidebar menu"
         >
           <Menu className="w-5 h-5" />
         </button>
-      </div>
+      </header>
 
-      {/* Mobile Slide-Over Drawer with Backdrop */}
+      {/* Mobile Slide-Over Drawer from Left with Backdrop */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 md:hidden flex animate-in fade-in duration-200">
-          {/* Backdrop */}
+          {/* Dark Backdrop */}
           <div
-            className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
-          {/* Drawer Content */}
-          <div className="relative w-72 max-w-[85vw] bg-white h-full flex flex-col z-10 shadow-2xl animate-in slide-in-from-left duration-200">
+          {/* Drawer Panel Sliding from Left */}
+          <div className="relative w-72 max-w-[85vw] bg-white h-full flex flex-col z-10 shadow-2xl animate-in slide-in-from-left duration-250 ease-out">
             {navigationContent}
           </div>
         </div>
       )}
 
-      {/* Desktop Persistent Sidebar */}
+      {/* Desktop Persistent Left Sidebar */}
       <aside className="hidden md:flex w-64 bg-white text-slate-700 flex-col shrink-0 h-screen sticky top-0 border-r border-slate-200 shadow-2xs">
         {navigationContent}
       </aside>

@@ -13,9 +13,9 @@ export default function AdminLoading() {
       </header>
 
       {/* Main Body */}
-      <main className="p-6 md:p-8 space-y-6 flex-1 w-full max-w-full">
+      <main className="p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 flex-1 w-full max-w-full">
         {/* 4 Stat Cards Skeleton */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}

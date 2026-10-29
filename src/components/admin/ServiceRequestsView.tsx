@@ -151,7 +151,7 @@ export function ServiceRequestsView() {
   return (
     <div className="w-full flex flex-col min-h-screen bg-slate-50">
       {/* Top Header */}
-      <header className="bg-white border-b border-slate-200 px-6 md:px-8 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sticky top-0 z-30 shadow-2xs w-full">
+      <header className="bg-white border-b border-slate-200 px-4 sm:px-6 md:px-8 py-3.5 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 static md:sticky md:top-0 md:z-30 shadow-2xs w-full">
         <div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">
             Service Requests
@@ -176,9 +176,9 @@ export function ServiceRequestsView() {
       </header>
 
       {/* Main Body */}
-      <div className="p-6 md:p-8 space-y-6 w-full max-w-none flex-1">
+      <div className="p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 w-full max-w-none flex-1">
         {/* KPI Metrics Strip - Exactly 4 cards, Quoted Volume removed */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
           {/* Metric 1 */}
           <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
@@ -276,9 +276,14 @@ export function ServiceRequestsView() {
             </div>
           </div>
 
-          {/* Data Table with Visible, Clear Text */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          {/* Mobile Swipe Hint */}
+          <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between sm:hidden text-[11px] text-slate-500 font-medium">
+            <span>← Swipe table horizontally to see all columns →</span>
+          </div>
+
+          {/* Data Table with Visible, Clear Text & Horizontal Scrolling */}
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left border-collapse min-w-[960px]">
               <thead>
                 <tr className="bg-slate-50/90 text-slate-600 font-bold text-xs uppercase tracking-wider border-b border-slate-200">
                   <th className="py-4 px-5">Ref &amp; Issue</th>
