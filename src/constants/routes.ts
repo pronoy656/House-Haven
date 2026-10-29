@@ -45,6 +45,18 @@ export const ROUTES = {
     DATE_TIME: "/services/requests/date-time",
     QUOTE: "/services/requests/quote",
   },
+  ADMIN: {
+    DASHBOARD: "/admin/dashboard",
+    REQUESTS: "/admin/requests",
+    CONTRACTORS: "/admin/contractors",
+    USERS: {
+      TENANTS: "/admin/users/tenants",
+      LANDLORDS: "/admin/users/landlords",
+      SERVICE_CLIENTS: "/admin/users/service-clients",
+    },
+    FINANCES: "/admin/finances",
+    SETTINGS: "/admin/settings",
+  },
 } as const;
 
 export type AppRoutes = typeof ROUTES;

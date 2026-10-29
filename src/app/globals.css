@@ -21,6 +21,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Fix Radix UI Select / react-remove-scroll layout shift (prevents modal from jumping left/right when dropdown opens) */
+html {
+  scrollbar-gutter: stable;
+}
+
+body[data-scroll-locked] {
+  margin-right: 0px !important;
+  padding-right: 0px !important;
+  overflow: auto !important;
+  position: static !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
 /* Custom scrollbar for web app view */
 ::-webkit-scrollbar {
   width: 6px;
