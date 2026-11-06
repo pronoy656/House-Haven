@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Users,
   Search,
@@ -13,6 +13,8 @@ import {
   Briefcase,
   Plus,
   ExternalLink,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   Select,
@@ -65,6 +67,20 @@ export function ContractorsView() {
     });
   }, [contractors, statusFilter, tradeFilter, searchQuery]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, tradeFilter, searchQuery, pageSize]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredContractors.length / pageSize));
+  const paginatedContractors = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredContractors.slice(start, start + pageSize);
+  }, [filteredContractors, currentPage, pageSize]);
+
   return (
     <div className="w-full flex flex-col min-h-screen bg-slate-50">
       {/* Top Header */}
@@ -94,7 +110,7 @@ export function ContractorsView() {
 
       {/* Main Content */}
       <div className="p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 w-full max-w-none flex-1">
-        {/* Contractor-Specific KPI Cards */}
+        {/* Contractor-Specific KPI Cards - Uniform Clean Slate Borders */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
           {/* Metric 1 */}
           <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
@@ -110,39 +126,39 @@ export function ContractorsView() {
           </div>
 
           {/* Metric 2 */}
-          <div className="p-4 bg-white border border-emerald-200 bg-emerald-50/20 rounded-2xl shadow-2xs">
+          <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Available Now
               </span>
-              <span className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700">
+              <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
                 <CheckCircle2 className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-2xl font-bold text-emerald-900 mt-2">{metrics.available}</p>
+            <p className="text-2xl font-bold text-slate-900 mt-2">{metrics.available}</p>
           </div>
 
           {/* Metric 3 */}
-          <div className="p-4 bg-white border border-amber-200 bg-amber-50/20 rounded-2xl shadow-2xs">
+          <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 On Active Jobs
               </span>
-              <span className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700">
+              <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
                 <Clock className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-2xl font-bold text-amber-900 mt-2">{metrics.busy}</p>
+            <p className="text-2xl font-bold text-slate-900 mt-2">{metrics.busy}</p>
           </div>
 
           {/* Metric 4 */}
           <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-[#0891A2] uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Average Rating
               </span>
-              <span className="w-8 h-8 rounded-lg bg-[#0891A2]/10 flex items-center justify-center text-[#0891A2]">
-                <Star className="w-4 h-4 fill-current text-amber-500" />
+              <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
+                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
               </span>
             </div>
             <p className="text-2xl font-bold text-slate-900 mt-2">{metrics.avgRating} ★</p>
@@ -196,7 +212,7 @@ export function ContractorsView() {
                 No contractors found matching the filter criteria.
               </div>
             ) : (
-              filteredContractors.map((c) => (
+              paginatedContractors.map((c) => (
                 <div
                   key={c.id}
                   className="bg-white border border-slate-200/90 rounded-2xl p-5 hover:border-slate-300 hover:shadow-xs transition-all space-y-4 flex flex-col justify-between"
@@ -279,6 +295,73 @@ export function ContractorsView() {
               ))
             )}
           </div>
+
+          {/* Pagination Footer */}
+          {filteredContractors.length > 0 && (
+            <div className="mt-6 p-4 border border-slate-200 rounded-2xl bg-white flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600 shadow-2xs">
+              <div className="flex items-center gap-3">
+                <span>
+                  Showing <strong className="text-slate-900 font-bold">{(currentPage - 1) * pageSize + 1}</strong> to{" "}
+                  <strong className="text-slate-900 font-bold">{Math.min(currentPage * pageSize, filteredContractors.length)}</strong> of{" "}
+                  <strong className="text-slate-900 font-bold">{filteredContractors.length}</strong> contractors
+                </span>
+                <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200">
+                  <span className="text-xs text-slate-400">Rows:</span>
+                  <Select
+                    value={String(pageSize)}
+                    onValueChange={(val) => {
+                      setPageSize(Number(val));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="h-7 w-[68px] text-xs rounded-lg bg-slate-50 border-slate-200 font-medium">
+                      <SelectValue placeholder="10" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="25">25</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage <= 1}
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer flex items-center gap-1 font-semibold text-xs"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span>Prev</span>
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    type="button"
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`w-7 h-7 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                      currentPage === pageNum
+                        ? "bg-[#0891A2] text-white shadow-2xs"
+                        : "hover:bg-slate-100 text-slate-700"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage >= totalPages}
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer flex items-center gap-1 font-semibold text-xs"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

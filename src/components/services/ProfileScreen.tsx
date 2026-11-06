@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Calendar,
@@ -12,10 +12,15 @@ import {
   User,
   CheckCircle2,
   LogOut,
+  LogIn,
+  UserPlus,
+  ShieldCheck,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/shared/Button";
 import { InputField } from "@/components/shared/InputField";
 import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { authApi } from "@/lib/api";
 
 interface ProfileScreenProps {
   onNavigateToServices?: () => void;
@@ -41,6 +46,18 @@ export function ProfileScreen({
 
   const [isLoading, setIsLoading] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("accessToken");
+      const storedEmail = localStorage.getItem("userEmail");
+      const storedName = localStorage.getItem("userName");
+      setIsGuest(!token);
+      if (storedEmail) setEmail(storedEmail);
+      if (storedName) setFullName(storedName);
+    }
+  }, []);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,14 +69,15 @@ export function ProfileScreen({
     }, 400);
   };
 
-  const handleLogoutClick = () => {
+  const handleLogoutClick = async () => {
     if (onLogout) {
       onLogout();
     } else {
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("userRole");
+      try {
+        await authApi.logout();
+      } finally {
+        router.push("/login");
       }
-      router.push("/login");
     }
   };
 
@@ -69,42 +87,97 @@ export function ProfileScreen({
       <div className="pt-3 pb-2 px-5 shrink-0 z-20 bg-white border-b border-slate-50 flex items-center justify-between">
         <div className="w-9" />
         <h1 className="text-lg font-bold text-slate-900 tracking-tight">
-          Profile
+          {isGuest ? "Guest Profile" : "Profile"}
         </h1>
-        <button
-          type="button"
-          onClick={handleLogoutClick}
-          className="w-9 h-9 rounded-full border border-slate-200 hover:border-red-200 hover:bg-red-50 text-slate-500 hover:text-red-600 flex items-center justify-center transition-colors cursor-pointer"
-          title="Log Out"
-          aria-label="Log Out"
-        >
-          <LogOut className="w-4 h-4" />
-        </button>
+        {isGuest ? (
+          <button
+            type="button"
+            onClick={() => router.push("/login?redirect=/services/profile")}
+            className="text-xs font-semibold text-[#0891A2] hover:underline cursor-pointer"
+          >
+            Sign In
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleLogoutClick}
+            className="w-9 h-9 rounded-full border border-slate-200 hover:border-red-200 hover:bg-red-50 text-slate-500 hover:text-red-600 flex items-center justify-center transition-colors cursor-pointer"
+            title="Log Out"
+            aria-label="Log Out"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
-      {/* Scrollable Form Body */}
-      <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar px-6 py-3 space-y-4 text-left">
-        {/* Profile Avatar with Edit Pencil */}
-        <div className="flex justify-center pt-1 pb-2">
-          <div className="relative">
-            {/* Avatar Circle */}
-            <div className="w-20 h-20 rounded-full overflow-hidden bg-slate-200 border-2 border-slate-100 shadow-sm flex items-center justify-center text-slate-400">
-              {/* Graphic Avatar matching smiling person */}
-              <div className="w-full h-full bg-gradient-to-tr from-slate-800 to-slate-600 flex items-center justify-center text-white font-bold text-xl">
-                AL
-              </div>
+      {/* Scrollable Content Body */}
+      <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar px-6 py-3 text-left">
+        {isGuest ? (
+          <div className="py-6 flex flex-col items-center text-center space-y-4 animate-fade-in">
+            <div className="w-20 h-20 rounded-full bg-teal-50 border-2 border-teal-100 flex items-center justify-center text-[#0891A2] shadow-xs">
+              <User className="w-10 h-10 stroke-[1.8]" />
             </div>
 
-            {/* Pencil Edit Badge */}
-            <button
-              type="button"
-              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#0891A2] text-white flex items-center justify-center shadow-xs hover:bg-[#0e7490] transition-colors cursor-pointer"
-              aria-label="Edit Profile Photo"
-            >
-              <Pencil className="w-3 h-3" />
-            </button>
+            <div className="space-y-1.5 px-4">
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                Guest Explorer
+              </h2>
+              <p className="text-xs text-slate-500 leading-relaxed max-w-[280px]">
+                You are currently browsing House Haven property services as a guest. Sign in or register to manage bookings, save addresses, and track technician quotes.
+              </p>
+            </div>
+
+            <div className="w-full space-y-2.5 pt-4">
+              <Button
+                variant="primary"
+                onClick={() => router.push("/login?redirect=/services/profile")}
+                className="w-full h-12 text-sm font-semibold tracking-wide gap-2 cursor-pointer"
+              >
+                <LogIn className="w-4 h-4" />
+                Sign In to Your Account
+              </Button>
+
+              <Button
+                variant="secondary"
+                onClick={() => router.push("/choose-role")}
+                className="w-full h-12 text-sm font-semibold tracking-wide border border-[#0891A2] text-[#0891A2] hover:bg-[#0891A2]/10 gap-2 cursor-pointer"
+              >
+                <UserPlus className="w-4 h-4" />
+                Create New Account
+              </Button>
+
+              <button
+                type="button"
+                onClick={onNavigateToServices}
+                className="w-full py-2.5 text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center justify-center gap-1 transition-colors cursor-pointer"
+              >
+                <span>Continue browsing services</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Profile Avatar with Edit Pencil */}
+            <div className="flex justify-center pt-1 pb-2">
+              <div className="relative">
+                {/* Avatar Circle */}
+                <div className="w-20 h-20 rounded-full overflow-hidden bg-slate-200 border-2 border-slate-100 shadow-sm flex items-center justify-center text-slate-400">
+                  <div className="w-full h-full bg-gradient-to-tr from-slate-800 to-slate-600 flex items-center justify-center text-white font-bold text-xl">
+                    AL
+                  </div>
+                </div>
+
+                {/* Pencil Edit Badge */}
+                <button
+                  type="button"
+                  className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#0891A2] text-white flex items-center justify-center shadow-xs hover:bg-[#0e7490] transition-colors cursor-pointer"
+                  aria-label="Edit Profile Photo"
+                >
+                  <Pencil className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
 
         <form onSubmit={handleSave} className="space-y-3.5">
           {/* Full Name */}
@@ -263,6 +336,8 @@ export function ProfileScreen({
           <div className="p-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center justify-center gap-1.5 font-medium animate-fade-in">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             <span>Profile saved successfully!</span>
+          </div>
+        )}
           </div>
         )}
       </div>

@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/select";
 import { AdminUser } from "./types";
 import { ADMIN_USERS } from "./adminMockData";
+import { adminApi } from "@/lib/api";
 
 interface UsersViewProps {
   forcedRole: "Tenant" | "Landlord" | "Service Client";
@@ -48,12 +49,54 @@ export function UsersView({
   const [users, setUsers] = useState<AdminUser[]>(ADMIN_USERS);
   const [searchQuery, setSearchQuery] = useState("");
   const [verificationFilter, setVerificationFilter] = useState<string>("All");
+  const [isLoading, setIsLoading] = useState(true);
 
   // Portal mount check
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Fetch live users from backend
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoading(true);
+
+    adminApi
+      .getUsers(forcedRole, searchQuery)
+      .then((res: any) => {
+        if (!isMounted) return;
+        const rawData = Array.isArray(res) ? res : res?.data || [];
+        if (Array.isArray(rawData) && rawData.length > 0) {
+          const mapped: AdminUser[] = rawData.map((u: any) => ({
+            id: u._id,
+            name: u.name || "Unnamed User",
+            email: u.email || "no-email@househeaven.com",
+            phone: u.phone || "Not provided",
+            role: forcedRole,
+            verificationStatus: u.verified ? "Verified" : "Pending ID",
+            joinedDate: u.createdAt
+              ? new Date(u.createdAt).toISOString().split("T")[0]
+              : "2026-01-01",
+            activeLeasesOrJobs: u.activeLeasesOrJobs || 0,
+            status: u.status === "active" ? "Active" : "Suspended",
+          }));
+          setUsers(mapped);
+        } else if (Array.isArray(rawData) && rawData.length === 0) {
+          setUsers([]);
+        }
+      })
+      .catch((err) => {
+        console.warn("Using fallback users data:", err.message);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [forcedRole, searchQuery]);
 
   // Three-dot Action Menu State with Fixed Coordinates (Portal)
   const [activeMenuUser, setActiveMenuUser] = useState<AdminUser | null>(null);
@@ -66,7 +109,12 @@ export function UsersView({
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
+  const [pageSize, setPageSize] = useState(10);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [verificationFilter, searchQuery, pageSize, forcedRole]);
 
   // Toggle Dropdown with Smart Position
   const handleToggleMenu = (e: React.MouseEvent<HTMLButtonElement>, user: AdminUser) => {
@@ -118,19 +166,16 @@ export function UsersView({
     return users.filter((u) => u.role === forcedRole);
   }, [users, forcedRole]);
 
-  // Sub-route Specific Metrics
+  // Sub-route Specific Metrics directly backed by Database
   const metrics = useMemo(() => {
     const totalInRole = roleUsers.length;
     const verified = roleUsers.filter((u) => u.verificationStatus === "Verified").length;
     const pendingVerification = roleUsers.filter(
       (u) => u.verificationStatus === "Pending ID"
     ).length;
-    const activeJobsOrLeases = roleUsers.reduce(
-      (acc, u) => acc + (u.activeLeasesOrJobs || 0),
-      0
-    );
+    const activeAccounts = roleUsers.filter((u) => u.status === "Active").length;
 
-    return { totalInRole, verified, pendingVerification, activeJobsOrLeases };
+    return { totalInRole, verified, pendingVerification, activeAccounts };
   }, [roleUsers]);
 
   // Filtered users for table
@@ -166,19 +211,29 @@ export function UsersView({
     setMenuCoords(null);
   };
 
-  const handleToggleStatus = (id: string) => {
+  const handleToggleStatus = async (id: string) => {
+    const user = users.find((u) => u.id === id);
+    if (!user) return;
+    const newStatus = user.status === "Active" ? ("Suspended" as const) : ("Active" as const);
+
     setUsers((prev) =>
       prev.map((u) =>
         u.id === id
           ? {
               ...u,
-              status: u.status === "Active" ? ("Suspended" as const) : ("Active" as const),
+              status: newStatus,
             }
           : u
       )
     );
     setActiveMenuUser(null);
     setMenuCoords(null);
+
+    try {
+      await adminApi.updateUserStatus(id, newStatus === "Active" ? "active" : "inactive");
+    } catch (err) {
+      console.warn("Backend user status update note:", err);
+    }
   };
 
   const handleOpenDetails = (user: AdminUser) => {
@@ -224,7 +279,7 @@ export function UsersView({
 
       {/* Main Body */}
       <main className="p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 flex-1 w-full max-w-full">
-        {/* 4 Stat Cards */}
+        {/* 4 Stat Cards - Uniform Clean Slate Borders with Skeleton Loading */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
           <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
@@ -235,49 +290,59 @@ export function UsersView({
                 <Users className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-2xl font-bold text-slate-900 mt-2">{metrics.totalInRole}</p>
+            {isLoading ? (
+              <div className="h-8 w-14 bg-slate-200 rounded-md animate-pulse mt-2"></div>
+            ) : (
+              <p className="text-2xl font-bold text-slate-900 mt-2">{metrics.totalInRole}</p>
+            )}
           </div>
 
-          <div className="p-4 bg-white border border-emerald-200 bg-emerald-50/20 rounded-2xl shadow-2xs">
+          <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
-                Verified Accounts
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Active Accounts
               </span>
-              <span className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700">
+              <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
+                <CheckCircle2 className="w-4 h-4" />
+              </span>
+            </div>
+            {isLoading ? (
+              <div className="h-8 w-14 bg-slate-200 rounded-md animate-pulse mt-2"></div>
+            ) : (
+              <p className="text-2xl font-bold text-slate-900 mt-2">{metrics.activeAccounts}</p>
+            )}
+          </div>
+
+          <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Verified (ID Passed)
+              </span>
+              <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
                 <ShieldCheck className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-2xl font-bold text-emerald-900 mt-2">{metrics.verified}</p>
+            {isLoading ? (
+              <div className="h-8 w-14 bg-slate-200 rounded-md animate-pulse mt-2"></div>
+            ) : (
+              <p className="text-2xl font-bold text-slate-900 mt-2">{metrics.verified}</p>
+            )}
           </div>
 
-          <div className="p-4 bg-white border border-teal-200 bg-teal-50/20 rounded-2xl shadow-2xs">
+          <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-teal-700 uppercase tracking-wider">
-                {forcedRole === "Tenant"
-                  ? "Active Leases"
-                  : forcedRole === "Landlord"
-                  ? "Managed Properties"
-                  : "Active Service Jobs"}
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Pending Verification
               </span>
-              <span className="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center text-teal-700">
-                <FileText className="w-4 h-4" />
-              </span>
-            </div>
-            <p className="text-2xl font-bold text-teal-900 mt-2">
-              {metrics.activeJobsOrLeases}
-            </p>
-          </div>
-
-          <div className="p-4 bg-white border border-amber-200 bg-amber-50/20 rounded-2xl shadow-2xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
-                Pending ID Review
-              </span>
-              <span className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700">
+              <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
                 <ShieldAlert className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-2xl font-bold text-amber-900 mt-2">{metrics.pendingVerification}</p>
+            {isLoading ? (
+              <div className="h-8 w-14 bg-slate-200 rounded-md animate-pulse mt-2"></div>
+            ) : (
+              <p className="text-2xl font-bold text-slate-900 mt-2">{metrics.pendingVerification}</p>
+            )}
           </div>
         </div>
 
@@ -338,7 +403,39 @@ export function UsersView({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {paginated.length === 0 ? (
+                {isLoading ? (
+                  Array.from({ length: 5 }).map((_, idx) => (
+                    <tr key={idx} className="animate-pulse border-b border-slate-100">
+                      <td className="py-4 px-5">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-slate-200 shrink-0"></div>
+                          <div>
+                            <div className="h-4 w-28 bg-slate-200 rounded-md mb-1"></div>
+                            <div className="h-3 w-36 bg-slate-100 rounded-md"></div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-5">
+                        <div className="h-6 w-20 bg-slate-200 rounded-md"></div>
+                      </td>
+                      <td className="py-4 px-5">
+                        <div className="h-4 w-24 bg-slate-200 rounded-md"></div>
+                      </td>
+                      <td className="py-4 px-5">
+                        <div className="h-6 w-20 bg-slate-200 rounded-full"></div>
+                      </td>
+                      <td className="py-4 px-5">
+                        <div className="h-4 w-24 bg-slate-200 rounded-md"></div>
+                      </td>
+                      <td className="py-4 px-5">
+                        <div className="h-6 w-16 bg-slate-200 rounded-full"></div>
+                      </td>
+                      <td className="py-4 px-5 text-right">
+                        <div className="h-8 w-8 bg-slate-200 rounded-lg ml-auto"></div>
+                      </td>
+                    </tr>
+                  ))
+                ) : paginated.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-sm text-slate-400">
                       No {forcedRole.toLowerCase()}s found matching your search or filter.
@@ -407,11 +504,10 @@ export function UsersView({
                       {/* Account Status */}
                       <td className="py-4 px-5">
                         <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${
-                            user.status === "Active"
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${user.status === "Active"
                               ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                               : "bg-rose-50 text-rose-700 border-rose-200"
-                          }`}
+                            }`}
                         >
                           {user.status}
                         </span>
@@ -422,11 +518,10 @@ export function UsersView({
                         <button
                           type="button"
                           onClick={(e) => handleToggleMenu(e, user)}
-                          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer ml-auto ${
-                            activeMenuUser?.id === user.id
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer ml-auto ${activeMenuUser?.id === user.id
                               ? "bg-slate-200 text-slate-900"
                               : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
-                          }`}
+                            }`}
                           aria-label={`Actions for ${user.name}`}
                         >
                           <MoreVertical className="w-4 h-4" />
@@ -440,31 +535,69 @@ export function UsersView({
           </div>
 
           {/* Pagination Footer */}
-          <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <span className="text-xs text-slate-500">
-              Showing <strong className="text-slate-800">{paginated.length}</strong> of{" "}
-              <strong className="text-slate-800">{filtered.length}</strong> {forcedRole.toLowerCase()}s
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                Previous
-              </button>
-              <span className="text-xs font-medium text-slate-600 px-2">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                Next
-              </button>
+          {filtered.length > 0 && (
+            <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+              <div className="flex items-center gap-3">
+                <span>
+                  Showing <strong className="text-slate-900 font-bold">{(currentPage - 1) * pageSize + 1}</strong> to{" "}
+                  <strong className="text-slate-900 font-bold">{Math.min(currentPage * pageSize, filtered.length)}</strong> of{" "}
+                  <strong className="text-slate-900 font-bold">{filtered.length}</strong> {forcedRole.toLowerCase()}s
+                </span>
+                <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200">
+                  <span className="text-xs text-slate-400">Rows:</span>
+                  <Select
+                    value={String(pageSize)}
+                    onValueChange={(val) => {
+                      setPageSize(Number(val));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="h-7 w-[68px] text-xs rounded-lg bg-white border-slate-200 font-medium">
+                      <SelectValue placeholder="10" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="25">25</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage <= 1}
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer flex items-center gap-1 font-semibold text-xs"
+                >
+                  Previous
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    type="button"
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`w-7 h-7 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                      currentPage === pageNum
+                        ? "bg-[#0891A2] text-white shadow-2xs"
+                        : "hover:bg-slate-200 text-slate-700"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage >= totalPages}
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer flex items-center gap-1 font-semibold text-xs"
+                >
+                  Next
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
 
@@ -518,11 +651,10 @@ export function UsersView({
           <button
             type="button"
             onClick={() => handleToggleStatus(activeMenuUser.id)}
-            className={`w-full px-3.5 py-2 text-xs font-semibold flex items-center gap-2 cursor-pointer transition-colors ${
-              activeMenuUser.status === "Active"
+            className={`w-full px-3.5 py-2 text-xs font-semibold flex items-center gap-2 cursor-pointer transition-colors ${activeMenuUser.status === "Active"
                 ? "text-rose-600 hover:bg-rose-50"
                 : "text-emerald-600 hover:bg-emerald-50"
-            }`}
+              }`}
           >
             <UserX className="w-3.5 h-3.5" />
             <span>
@@ -578,16 +710,14 @@ export function UsersView({
                   <span className="font-semibold text-slate-900">{selectedUser.phone}</span>
                 </div>
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                   <span className="text-slate-400 block font-medium mb-1">Identity Verification</span>
                   <span
-                    className={`font-semibold inline-flex items-center gap-1 ${
-                      selectedUser.verificationStatus === "Verified"
+                    className={`font-semibold inline-flex items-center gap-1 ${selectedUser.verificationStatus === "Verified"
                         ? "text-emerald-700"
                         : "text-amber-700"
-                    }`}
+                      }`}
                   >
                     {selectedUser.verificationStatus === "Verified" ? (
                       <ShieldCheck className="w-3.5 h-3.5" />
@@ -600,9 +730,8 @@ export function UsersView({
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                   <span className="text-slate-400 block font-medium mb-1">Account Status</span>
                   <span
-                    className={`font-semibold ${
-                      selectedUser.status === "Active" ? "text-emerald-700" : "text-rose-700"
-                    }`}
+                    className={`font-semibold ${selectedUser.status === "Active" ? "text-emerald-700" : "text-rose-700"
+                      }`}
                   >
                     {selectedUser.status}
                   </span>
@@ -619,8 +748,8 @@ export function UsersView({
                     {selectedUser.role === "Tenant"
                       ? "Active Leases"
                       : selectedUser.role === "Landlord"
-                      ? "Properties Owned"
-                      : "Completed Jobs"}
+                        ? "Properties Owned"
+                        : "Completed Jobs"}
                   </span>
                   <span className="font-bold text-[#0891A2] text-sm">
                     {selectedUser.activeLeasesOrJobs}

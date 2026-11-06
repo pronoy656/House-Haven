@@ -12,11 +12,16 @@ import {
   Calendar,
   FileText,
   Check,
+  Lock,
+  LogIn,
+  UserPlus,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/shared/Button";
 import { InputField } from "@/components/shared/InputField";
 import { ScreenHeader } from "@/components/shared/ScreenHeader";
 import { ChooseDateTimeScreen } from "@/components/services/ChooseDateTimeScreen";
+import { serviceRequestApi } from "@/lib/api";
 
 export function ServiceBookingFlowScreen() {
   const router = useRouter();
@@ -43,22 +48,133 @@ export function ServiceBookingFlowScreen() {
   });
 
   const [isPosting, setIsPosting] = useState(false);
+  const [referenceId, setReferenceId] = useState("#SR-84920");
+  const [createdRequestId, setCreatedRequestId] = useState<string | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const handleConfirmPost = async (displayIssue: string, displayDesc: string) => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+    if (!token) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    setIsPosting(true);
+    setSubmitError(null);
+    try {
+      const res = await serviceRequestApi.submitRequest({
+        serviceCategory: service,
+        issue: displayIssue,
+        description: displayDesc,
+        address,
+        postcode: postcode || undefined,
+        appointment: {
+          date: appointment.date,
+          time: appointment.time,
+        },
+        quotation: {
+          requested: true,
+          estimatedPrice: quoted,
+        },
+        photos: photoPreview ? [photoPreview] : [],
+      });
+
+      if (res && res.success && res.data?._id) {
+        setCreatedRequestId(res.data._id);
+        setReferenceId(`#SR-${String(res.data._id).slice(-5).toUpperCase()}`);
+        setStep("success");
+        if (typeof window !== "undefined") {
+          localStorage.setItem("recentRequestId", res.data._id);
+          window.dispatchEvent(new Event("serviceRequestsUpdated"));
+        }
+      } else {
+        throw new Error(res?.message || "Failed to submit service request. Please try again.");
+      }
+    } catch (err: any) {
+      console.error("Submission failed:", err);
+      const msg = err?.message || "Could not submit request to server. Please try again.";
+      setSubmitError(msg);
+    } finally {
+      setIsPosting(false);
+    }
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("userRole", "service");
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        localStorage.setItem("userRole", "service");
+      }
     }
   }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setPhotoPreview(URL.createObjectURL(file));
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setSubmitError("Please choose a valid image file (PNG, JPG, JPEG, WebP).");
+      return;
     }
+
+    // Guard against enormous files > 20MB
+    if (file.size > 20 * 1024 * 1024) {
+      setSubmitError("Image file size is too large. Please select an image under 20MB.");
+      return;
+    }
+
+    setSubmitError(null);
+
+    // Read and compress via Canvas to ensure optimal resolution and payload size
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const maxWidth = 1280;
+        const maxHeight = 1280;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL("image/jpeg", 0.82);
+          setPhotoPreview(compressed);
+        } else {
+          setPhotoPreview(event.target?.result as string);
+        }
+      };
+      img.onerror = () => {
+        setPhotoPreview(event.target?.result as string);
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!issue.trim()) {
+      setSubmitError("Please enter the issue title (e.g. leaking pipe, power trip).");
+      return;
+    }
+    setSubmitError(null);
     setStep("datetime");
   };
 
@@ -71,7 +187,7 @@ export function ServiceBookingFlowScreen() {
         {/* Top Header */}
         <ScreenHeader
           title="Request Service"
-          backHref="/services?role=service"
+          backHref="/services"
           className="px-0 pt-2 pb-3"
         />
 
@@ -196,6 +312,23 @@ export function ServiceBookingFlowScreen() {
               placeholder="$75–$100"
             />
           </div>
+
+          {/* Error Message if Validation or File Fails */}
+          {submitError && (
+            <div className="mx-0 mb-2 p-3 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-2 text-xs text-red-700 animate-fade-in shadow-2xs">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold leading-tight">{submitError}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSubmitError(null)}
+                className="text-red-400 hover:text-red-700 cursor-pointer font-bold text-sm leading-none ml-1"
+              >
+                ×
+              </button>
+            </div>
+          )}
 
           {/* Bottom Continue Button */}
           <div className="shrink-0 pt-3 border-t border-slate-50">
@@ -341,24 +474,89 @@ export function ServiceBookingFlowScreen() {
           </div>
         </div>
 
+        {/* Error message if submission failed */}
+        {submitError && (
+          <div className="mx-0 mb-3 p-3 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-2.5 text-xs text-red-700 animate-fade-in shadow-2xs">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="font-bold">Booking Submission Failed</p>
+              <p className="mt-0.5 text-red-600 leading-relaxed">{submitError}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSubmitError(null)}
+              className="text-red-400 hover:text-red-700 cursor-pointer font-bold text-sm leading-none ml-1"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {/* Bottom Action: Confirm Post */}
         <div className="pt-3 shrink-0 z-20 bg-white border-t border-slate-50">
           <Button
             type="button"
             variant="primary"
-            onClick={() => {
-              setIsPosting(true);
-              setTimeout(() => {
-                setIsPosting(false);
-                setStep("success");
-              }, 400);
-            }}
+            onClick={() => handleConfirmPost(displayIssueTitle, displayDescription)}
             isLoading={isPosting}
             className="h-12 font-semibold text-sm tracking-wide cursor-pointer"
           >
             Confirm Post
           </Button>
         </div>
+
+        {/* Auth Required Modal for Guest */}
+        {showAuthModal && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-5 animate-fade-in">
+            <div className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl text-center space-y-4 border border-slate-100">
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-teal-50 text-[#0891A2] flex items-center justify-center shadow-inner">
+                <Lock className="w-7 h-7 stroke-[2.2]" />
+              </div>
+
+              <div className="space-y-1.5">
+                <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+                  Sign In to Confirm Booking
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Please sign in or create an account to finalize your booking for <strong className="text-slate-800">{service}</strong>, schedule your technician, and receive quotation updates.
+                </p>
+              </div>
+
+              <div className="space-y-2 pt-2">
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    const currentUrl = typeof window !== "undefined" ? window.location.pathname + window.location.search : "/services";
+                    router.push(`/login?redirect=${encodeURIComponent(currentUrl)}`);
+                  }}
+                  className="w-full h-11 text-xs font-semibold gap-1.5"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Sign In
+                </Button>
+
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    router.push("/choose-role");
+                  }}
+                  className="w-full h-11 text-xs font-semibold border border-[#0891A2] text-[#0891A2] hover:bg-[#0891A2]/10 gap-1.5"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Create New Account
+                </Button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowAuthModal(false)}
+                  className="w-full py-2 text-xs font-medium text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  Keep Reviewing
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -387,7 +585,7 @@ export function ServiceBookingFlowScreen() {
         <div className="w-full mt-4 p-4 bg-white/90 backdrop-blur-xs border border-slate-200/90 rounded-2xl shadow-xs text-left space-y-2.5">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <span className="text-[11px] text-slate-400 font-medium">Request Reference</span>
-            <span className="text-xs font-mono font-bold text-slate-800">#SR-84920</span>
+            <span className="text-xs font-mono font-bold text-slate-800">{referenceId}</span>
           </div>
 
           <div className="flex items-center justify-between text-xs">
@@ -414,15 +612,21 @@ export function ServiceBookingFlowScreen() {
         <Button
           type="button"
           variant="primary"
-          onClick={() => router.push("/services/requests?role=service")}
+          onClick={() => {
+            if (createdRequestId) {
+              router.push(`/services/requests/details?id=${encodeURIComponent(createdRequestId)}`);
+            } else {
+              router.push("/services/requests");
+            }
+          }}
           className="w-full h-12 font-semibold text-sm tracking-wide cursor-pointer shadow-sm"
         >
-          View in My Requests
+          Track in My Requests
         </Button>
 
         <button
           type="button"
-          onClick={() => router.push("/services?role=service")}
+          onClick={() => router.push("/services")}
           className="w-full py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
         >
           Back to Services Hub

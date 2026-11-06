@@ -15,7 +15,10 @@ import {
   TrendingUp,
   Edit3,
   Camera,
+  LogOut,
+  X,
 } from "lucide-react";
+import { authApi } from "@/lib/api";
 import { Button } from "@/components/shared/Button";
 import { InputField } from "@/components/shared/InputField";
 import { ScreenHeader } from "@/components/shared/ScreenHeader";
@@ -93,6 +96,21 @@ const COMPLETION_CARDS: CompletionItem[] = [
 
 export function TenantProfileScreen() {
   const router = useRouter();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await authApi.logout();
+    } catch {
+      // Continue client cleanup
+    } finally {
+      setIsLoggingOut(false);
+      setShowLogoutModal(false);
+      router.push("/login");
+    }
+  };
 
   // Navigation Sub-view State: "profile" | "boost" | "payment"
   const [viewMode, setViewMode] = useState<"profile" | "boost" | "payment">("profile");
@@ -189,15 +207,27 @@ export function TenantProfileScreen() {
           title="Profile"
           onBack={() => router.push("/tenant/dashboard")}
           rightAction={
-            <Button
-              variant="icon"
-              size="icon-sm"
-              onClick={() => showToast("Settings opened")}
-              aria-label="Settings"
-              className="text-slate-700 hover:bg-slate-100"
-            >
-              <Settings className="w-5 h-5 stroke-[2]" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="icon"
+                size="icon-sm"
+                onClick={() => setShowLogoutModal(true)}
+                aria-label="Log Out"
+                className="text-rose-500 hover:bg-rose-50"
+                title="Log Out"
+              >
+                <LogOut className="w-4 h-4 stroke-[2]" />
+              </Button>
+              <Button
+                variant="icon"
+                size="icon-sm"
+                onClick={() => showToast("Settings opened")}
+                aria-label="Settings"
+                className="text-slate-700 hover:bg-slate-100"
+              >
+                <Settings className="w-5 h-5 stroke-[2]" />
+              </Button>
+            </div>
           }
         />
       </div>
@@ -461,8 +491,16 @@ export function TenantProfileScreen() {
             })}
           </div>
 
-          {/* Boost Profile Action Button */}
-          <div className="flex justify-end pt-1 pb-3">
+          {/* Actions: Boost Profile & Logout */}
+          <div className="flex items-center justify-between pt-1 pb-3 gap-3">
+            <button
+              type="button"
+              onClick={() => setShowLogoutModal(true)}
+              className="h-10 px-4 rounded-2xl border border-rose-200 bg-rose-50/50 hover:bg-rose-50 active:scale-98 text-rose-600 font-semibold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Log Out</span>
+            </button>
             <Button
               variant="primary"
               onClick={() => setViewMode("boost")}
@@ -478,6 +516,56 @@ export function TenantProfileScreen() {
       {/* Bottom Navigation Bar */}
       <TenantBottomNav activeTab="profile" />
 
+      {/* Logout Confirmation Modal Overlay */}
+      {showLogoutModal && (
+        <div className="absolute inset-0 z-50 bg-black/45 backdrop-blur-[3px] flex items-center justify-center p-5 transition-all animate-in fade-in duration-200">
+          <div className="w-full max-w-[300px] bg-white rounded-3xl p-6 shadow-2xl relative text-center space-y-3.5">
+            <button
+              type="button"
+              onClick={() => setShowLogoutModal(false)}
+              aria-label="Close"
+              className="absolute top-3.5 right-3.5 w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5 stroke-[2.2]" />
+            </button>
+
+            <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-500 border border-rose-100 flex items-center justify-center mx-auto shadow-2xs">
+              <LogOut className="w-5 h-5 stroke-[2] ml-0.5" />
+            </div>
+
+            <div className="space-y-1 px-1">
+              <h3 className="text-[15px] font-bold text-slate-900 leading-snug">
+                Are you sure you want to logout?
+              </h3>
+              <p className="text-[11.5px] text-slate-400 font-normal">
+                You will need to sign in again to access your tenant account.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2 pt-2">
+              <Button
+                variant="primary"
+                size="md"
+                fullWidth
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="h-10 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white"
+              >
+                {isLoggingOut ? "Logging out..." : "Log Out"}
+              </Button>
+              <Button
+                variant="outline"
+                size="md"
+                fullWidth
+                onClick={() => setShowLogoutModal(false)}
+                className="h-10 rounded-2xl border-slate-200 text-slate-700"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

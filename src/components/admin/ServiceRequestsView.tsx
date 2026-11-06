@@ -25,18 +25,101 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ServiceRequest, Contractor, RequestStatus } from "./types";
+import { ServiceRequest, Contractor, RequestStatus, QuoteStatus } from "./types";
 import { INITIAL_SERVICE_REQUESTS, CONTRACTORS_LIST } from "./adminMockData";
+import { adminApi } from "@/lib/api";
 
 export function ServiceRequestsView() {
-  const [requests, setRequests] = useState<ServiceRequest[]>(INITIAL_SERVICE_REQUESTS);
+  const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [contractors] = useState<Contractor[]>(CONTRACTORS_LIST);
   const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Filter states
-  const [statusFilter, setStatusFilter] = useState<"All" | RequestStatus>("All");
+  // Filter states (supports "All", specific RequestStatus, or "Quotes Accepted")
+  const [statusFilter, setStatusFilter] = useState<"All" | RequestStatus | "Quotes Accepted">("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("All");
+
+  // Fetch live requests from backend
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoading(true);
+
+    adminApi
+      .getAllRequests({
+        status: statusFilter !== "All" && statusFilter !== "Quotes Accepted" ? statusFilter : undefined,
+        quoteStatus: statusFilter === "Quotes Accepted" ? "accepted" : undefined,
+        serviceCategory: categoryFilter !== "All" ? categoryFilter : undefined,
+      })
+      .then((res: any) => {
+        if (!isMounted) return;
+        const rawData = Array.isArray(res) ? res : res?.data || [];
+        if (Array.isArray(rawData) && rawData.length > 0) {
+          const mapped: ServiceRequest[] = rawData.map((item: any) => ({
+            id: item._id,
+            referenceNo: `#SR-${String(item._id).slice(-5).toUpperCase()}`,
+            title: item.issue || `${item.serviceCategory} issue`,
+            category: item.serviceCategory || "General",
+            user: {
+              name: item.userId?.name || item.contactName || "Guest User",
+              role:
+                item.userId?.role === "tenant"
+                  ? "Tenant"
+                  : item.userId?.role === "landlord"
+                  ? "Landlord"
+                  : "Service Client",
+              phone: item.userId?.phone || item.contactPhone || "Not provided",
+              email: item.userId?.email || item.contactEmail || "guest@househeaven.com",
+              avatar: item.userId?.profile,
+            },
+            address: item.address || "Armagh, UK",
+            postcode: item.postcode || "",
+            requestedDate:
+              item.appointment?.date ||
+              new Date(item.createdAt || Date.now()).toLocaleDateString(),
+            requestedTime: item.appointment?.time || "10:00 AM",
+            status: (item.status as RequestStatus) || "Pending",
+            quoteStatus: (item.quotation?.status as QuoteStatus) || "pending",
+            priority: "Medium",
+            description: item.description || "",
+            quotedPrice: item.quotation?.quotedAmount
+              ? `£${item.quotation.quotedAmount}`
+              : item.quotation?.estimatedPrice || "£75–£100",
+            quoteNotes: item.quotation?.quoteNotes || "",
+            assignedContractor:
+              typeof item.assignedContractor === "object" && item.assignedContractor?.name
+                ? item.assignedContractor.name
+                : typeof item.assignedContractor === "string"
+                ? item.assignedContractor
+                : undefined,
+            contractorDetails:
+              typeof item.assignedContractor === "object" && item.assignedContractor
+                ? item.assignedContractor
+                : undefined,
+            photos: item.photos || [],
+            createdAt: new Date(item.createdAt || Date.now())
+              .toISOString()
+              .split("T")[0],
+            source: "Services Hub",
+          }));
+          setRequests(mapped);
+        } else if (Array.isArray(rawData) && rawData.length === 0) {
+          // Keep empty if explicitly empty on backend
+          setRequests([]);
+        }
+      })
+      .catch((err) => {
+        console.warn("Using fallback service requests:", err.message);
+        setRequests(INITIAL_SERVICE_REQUESTS);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [statusFilter, categoryFilter]);
 
   // Modal editing states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,23 +129,62 @@ export function ServiceRequestsView() {
   const [adminNote, setAdminNote] = useState("");
   const [isSavedSuccess, setIsSavedSuccess] = useState(false);
 
-  // 4 Metrics Calculation (Quoted Volume removed as requested)
+  // 4 Metrics Calculation with Quotes Accepted highlight
   const metrics = useMemo(() => {
     const total = requests.length;
     const pending = requests.filter((r) => r.status === "Pending").length;
-    const quoted = requests.filter((r) => r.status === "Quoted").length;
+    const quotesAccepted = requests.filter(
+      (r) => r.quoteStatus === "accepted" && r.status !== "Completed" && r.status !== "Cancelled"
+    ).length;
     const inProgress = requests.filter((r) => r.status === "In Progress").length;
     const completed = requests.filter((r) => r.status === "Completed").length;
-    return { total, pending, quoted, inProgress, completed };
+    return { total, pending, quotesAccepted, inProgress, completed };
+  }, [requests]);
+
+  // Available categories list dynamically combining defaults and active request categories
+  const availableCategories = useMemo(() => {
+    const defaultCats = [
+      "New Bathroom Quote",
+      "New Kitchen Quote",
+      "Electrical",
+      "Plumbing",
+      "Heating & Boiler",
+      "Damp & Mould",
+      "Water and Leaks",
+      "Exterior and Garden",
+      "Window",
+      "Lighting",
+      "Gas Certificate",
+      "Appliances",
+      "Roofing & Guttering",
+      "Painting & Decorating",
+      "Home Buyers Report",
+    ];
+    const fromReqs = requests.map((r) => r.category).filter(Boolean);
+    return Array.from(new Set([...defaultCats, ...fromReqs]));
   }, [requests]);
 
   // Filtered requests
   const filteredRequests = useMemo(() => {
     return requests.filter((req) => {
-      if (statusFilter !== "All" && req.status !== statusFilter) {
+      if (statusFilter === "Quotes Accepted") {
+        if (
+          req.quoteStatus !== "accepted" ||
+          req.status === "Completed" ||
+          req.status === "Cancelled"
+        ) {
+          return false;
+        }
+      } else if (
+        statusFilter !== "All" &&
+        req.status.toLowerCase() !== statusFilter.toLowerCase()
+      ) {
         return false;
       }
-      if (categoryFilter !== "All" && req.category !== categoryFilter) {
+      if (
+        categoryFilter !== "All" &&
+        req.category.toLowerCase() !== categoryFilter.toLowerCase()
+      ) {
         return false;
       }
       if (searchQuery.trim()) {
@@ -81,7 +203,7 @@ export function ServiceRequestsView() {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
 
   // Reset page when filters or search change
   useEffect(() => {
@@ -97,34 +219,102 @@ export function ServiceRequestsView() {
 
   const handleOpenModal = (req: ServiceRequest) => {
     setSelectedRequest(req);
-    setEditPrice(req.quotedPrice || "");
+    setEditPrice(req.quotedPrice ? req.quotedPrice.replace(/^£/, "") : "");
     setEditContractor(req.assignedContractor || "");
-    setEditStatus(req.status);
-    setAdminNote("");
+
+    // If client accepted quote and job is still in Pending or Quoted, default to "In Progress"
+    if (
+      req.quoteStatus === "accepted" &&
+      (req.status === "Pending" || req.status === "Quoted")
+    ) {
+      setEditStatus("In Progress");
+    } else {
+      setEditStatus(req.status);
+    }
+
+    setAdminNote(req.quoteNotes || "");
     setIsSavedSuccess(false);
     setIsModalOpen(true);
+
+    // If photos are omitted from the list view for high performance, fetch single request details
+    if (!req.photos || req.photos.length === 0) {
+      adminApi
+        .getRequestDetails(req.id)
+        .then((fullData: any) => {
+          if (fullData && fullData.photos && fullData.photos.length > 0) {
+            setSelectedRequest((prev) =>
+              prev && prev.id === req.id
+                ? { ...prev, photos: fullData.photos }
+                : prev
+            );
+          }
+        })
+        .catch(() => {});
+    }
   };
 
-  const handleSaveModal = (e: React.FormEvent) => {
+  const handleSaveModal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRequest) return;
+
+    const newQuotedPrice = editPrice.trim()
+      ? editPrice.startsWith("£")
+        ? editPrice
+        : `£${editPrice}`
+      : selectedRequest.quotedPrice;
+
+    // Resolve contractor full details if matched
+    const matched = contractors.find((c) => c.name === editContractor);
+    const contractorPayload = matched
+      ? {
+          id: matched.id,
+          name: matched.name,
+          trade: matched.trade,
+          phone: matched.phone,
+          email: matched.email,
+          rating: matched.rating,
+          company: matched.company,
+        }
+      : editContractor.trim()
+      ? { name: editContractor.trim() }
+      : null;
 
     setRequests((prev) =>
       prev.map((r) =>
         r.id === selectedRequest.id
           ? {
               ...r,
-              quotedPrice: editPrice.trim()
-                ? editPrice.startsWith("£")
-                  ? editPrice
-                  : `£${editPrice}`
-                : r.quotedPrice,
+              quotedPrice: newQuotedPrice,
               assignedContractor: editContractor,
+              contractorDetails: matched || undefined,
               status: editStatus,
+              quoteNotes: adminNote,
             }
           : r
       )
     );
+
+    try {
+      const numeric = parseFloat(editPrice.replace(/[^0-9.]/g, ""));
+      await adminApi.manageRequest(selectedRequest.id, {
+        status: editStatus,
+        assignedContractor: contractorPayload,
+        quotedAmount: isNaN(numeric) ? undefined : numeric,
+        quoteNotes: adminNote || undefined,
+        quotationStatus:
+          selectedRequest.quoteStatus === "accepted"
+            ? "accepted"
+            : editStatus === "Quoted" || (numeric && numeric > 0)
+            ? "received"
+            : undefined,
+      });
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("serviceRequestsUpdated"));
+      }
+    } catch (err) {
+      console.warn("Backend manage update error:", err);
+    }
 
     setIsSavedSuccess(true);
     setTimeout(() => {
@@ -177,7 +367,7 @@ export function ServiceRequestsView() {
 
       {/* Main Body */}
       <div className="p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 w-full max-w-none flex-1">
-        {/* KPI Metrics Strip - Exactly 4 cards, Quoted Volume removed */}
+        {/* KPI Metrics Strip - Uniform Clean Slate Borders with Skeleton Loading */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
           {/* Metric 1 */}
           <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
@@ -189,48 +379,71 @@ export function ServiceRequestsView() {
                 <Layers className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-2xl font-bold text-slate-900 mt-2">{metrics.total}</p>
+            {isLoading ? (
+              <div className="h-8 w-14 bg-slate-200 rounded-md animate-pulse mt-2"></div>
+            ) : (
+              <p className="text-2xl font-bold text-slate-900 mt-2">{metrics.total}</p>
+            )}
           </div>
 
           {/* Metric 2 */}
-          <div className="p-4 bg-white border border-amber-200 bg-amber-50/20 rounded-2xl shadow-2xs">
+          <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Needs Quote
               </span>
-              <span className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700">
+              <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
                 <Clock className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-2xl font-bold text-amber-900 mt-2">{metrics.pending}</p>
+            {isLoading ? (
+              <div className="h-8 w-14 bg-slate-200 rounded-md animate-pulse mt-2"></div>
+            ) : (
+              <p className="text-2xl font-bold text-slate-900 mt-2">{metrics.pending}</p>
+            )}
           </div>
 
-          {/* Metric 3 */}
+          {/* Metric 3: Quotes Accepted */}
           <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-sky-700 uppercase tracking-wider">
-                Quoted &amp; Active
+              <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider flex items-center gap-1">
+                <span>Quotes Accepted</span>
+                {metrics.quotesAccepted > 0 && (
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                )}
               </span>
-              <span className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center text-sky-700">
-                <Zap className="w-4 h-4" />
+              <span className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <CheckCircle2 className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-2xl font-bold text-slate-900 mt-2">
-              {metrics.quoted + metrics.inProgress}
-            </p>
+            {isLoading ? (
+              <div className="h-8 w-14 bg-slate-200 rounded-md animate-pulse mt-2"></div>
+            ) : (
+              <div className="flex items-baseline justify-between mt-2">
+                <p className="text-2xl font-bold text-slate-900">{metrics.quotesAccepted}</p>
+                <span className="text-[11px] text-emerald-600 font-medium">Ready to Assign</span>
+              </div>
+            )}
           </div>
 
           {/* Metric 4 */}
           <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
-                Resolved
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                In Progress &amp; Done
               </span>
-              <span className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700">
-                <CheckCircle2 className="w-4 h-4" />
+              <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
+                <Zap className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-2xl font-bold text-slate-900 mt-2">{metrics.completed}</p>
+            {isLoading ? (
+              <div className="h-8 w-14 bg-slate-200 rounded-md animate-pulse mt-2"></div>
+            ) : (
+              <div className="flex items-baseline justify-between mt-2">
+                <p className="text-2xl font-bold text-slate-900">{metrics.inProgress + metrics.completed}</p>
+                <span className="text-[11px] text-slate-500">{metrics.completed} completed</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -240,17 +453,26 @@ export function ServiceRequestsView() {
           <div className="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
             {/* Status Tabs */}
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-              {(["All", "Pending", "Quoted", "In Progress", "Completed"] as const).map((tab) => (
+              {(["All", "Quotes Accepted", "Pending", "In Progress", "Completed"] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setStatusFilter(tab)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                     statusFilter === tab
-                      ? "bg-slate-900 text-white shadow-2xs"
+                      ? tab === "Quotes Accepted"
+                        ? "bg-emerald-700 text-white shadow-2xs"
+                        : "bg-slate-900 text-white shadow-2xs"
+                      : tab === "Quotes Accepted"
+                      ? "bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100"
                       : "bg-slate-50 text-slate-600 hover:bg-slate-100"
                   }`}
                 >
-                  {tab}
+                  <span>{tab}</span>
+                  {tab === "Quotes Accepted" && metrics.quotesAccepted > 0 && (
+                    <span className="w-4 h-4 rounded-full bg-emerald-600 text-white text-[10px] flex items-center justify-center font-bold">
+                      {metrics.quotesAccepted}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -262,15 +484,13 @@ export function ServiceRequestsView() {
                 <SelectTrigger className="w-[170px] bg-slate-50 border-slate-200 h-9 font-medium text-xs">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-60">
                   <SelectItem value="All">All Categories</SelectItem>
-                  <SelectItem value="Electricity">Electricity</SelectItem>
-                  <SelectItem value="Plumbing">Plumbing</SelectItem>
-                  <SelectItem value="Heating & Boiler">Heating &amp; Boiler</SelectItem>
-                  <SelectItem value="Damp & Mould">Damp &amp; Mould</SelectItem>
-                  <SelectItem value="Kitchen">Kitchen</SelectItem>
-                  <SelectItem value="Lighting">Lighting</SelectItem>
-                  <SelectItem value="Gas Certificate">Gas Certificate</SelectItem>
+                  {availableCategories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -297,7 +517,41 @@ export function ServiceRequestsView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {paginatedRequests.length === 0 ? (
+                {isLoading ? (
+                  Array.from({ length: 5 }).map((_, idx) => (
+                    <tr key={idx} className="animate-pulse border-b border-slate-100">
+                      <td className="py-4 px-5">
+                        <div className="h-4 w-20 bg-slate-200 rounded-md mb-2"></div>
+                        <div className="h-4 w-44 bg-slate-200 rounded-md mb-1"></div>
+                        <div className="h-3 w-24 bg-slate-100 rounded-md"></div>
+                      </td>
+                      <td className="py-4 px-5">
+                        <div className="h-4 w-28 bg-slate-200 rounded-md mb-1"></div>
+                        <div className="h-3 w-20 bg-slate-100 rounded-md"></div>
+                      </td>
+                      <td className="py-4 px-5">
+                        <div className="h-4 w-36 bg-slate-200 rounded-md mb-1"></div>
+                        <div className="h-3 w-16 bg-slate-100 rounded-md"></div>
+                      </td>
+                      <td className="py-4 px-5">
+                        <div className="h-4 w-24 bg-slate-200 rounded-md mb-1"></div>
+                        <div className="h-3 w-16 bg-slate-100 rounded-md"></div>
+                      </td>
+                      <td className="py-4 px-5">
+                        <div className="h-4 w-24 bg-slate-200 rounded-md"></div>
+                      </td>
+                      <td className="py-4 px-5">
+                        <div className="h-4 w-20 bg-slate-200 rounded-md"></div>
+                      </td>
+                      <td className="py-4 px-5">
+                        <div className="h-6 w-20 bg-slate-200 rounded-full"></div>
+                      </td>
+                      <td className="py-4 px-5 text-right">
+                        <div className="h-8 w-18 bg-slate-200 rounded-xl ml-auto"></div>
+                      </td>
+                    </tr>
+                  ))
+                ) : paginatedRequests.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="py-12 text-center text-sm text-slate-400">
                       No service requests found matching the selected filter.
@@ -351,6 +605,10 @@ export function ServiceRequestsView() {
                               {req.assignedContractor}
                             </span>
                           </div>
+                        ) : req.quoteStatus === "accepted" ? (
+                          <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 text-[11px] font-semibold animate-pulse">
+                            Assign Tech &rarr;
+                          </span>
                         ) : (
                           <span className="text-slate-400 italic text-xs">Unassigned</span>
                         )}
@@ -359,9 +617,21 @@ export function ServiceRequestsView() {
                       {/* Quote Price */}
                       <td className="py-4 px-5">
                         {req.quotedPrice ? (
-                          <span className="font-bold text-[#0891A2] text-sm">
-                            {req.quotedPrice}
-                          </span>
+                          <div>
+                            <span className="font-bold text-[#0891A2] text-sm block">
+                              {req.quotedPrice}
+                            </span>
+                            {req.quoteStatus === "accepted" ? (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 mt-0.5">
+                                <Check className="w-2.5 h-2.5" />
+                                Client Accepted
+                              </span>
+                            ) : req.quoteStatus === "declined" ? (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200 mt-0.5">
+                                Declined
+                              </span>
+                            ) : null}
+                          </div>
                         ) : (
                           <span className="text-amber-700 text-xs font-semibold bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 inline-block">
                             Pending Quote
@@ -371,24 +641,46 @@ export function ServiceRequestsView() {
 
                       {/* Status */}
                       <td className="py-4 px-5">
-                        <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusBadge(
-                            req.status
-                          )}`}
-                        >
-                          {req.status}
-                        </span>
+                        {req.quoteStatus === "accepted" && req.status !== "In Progress" && req.status !== "Completed" ? (
+                          <div className="flex flex-col gap-1 items-start">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                              Quote Accepted
+                            </span>
+                            <span className="text-[10px] text-amber-600 font-semibold pl-1">
+                              Needs Contractor
+                            </span>
+                          </div>
+                        ) : (
+                          <span
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusBadge(
+                              req.status
+                            )}`}
+                          >
+                            {req.status}
+                          </span>
+                        )}
                       </td>
 
                       {/* Action */}
                       <td className="py-4 px-5 text-right">
-                        <button
-                          onClick={() => handleOpenModal(req)}
-                          className="px-3.5 py-1.5 bg-[#0891A2] hover:bg-[#067a88] text-white rounded-xl font-semibold text-xs transition-colors cursor-pointer inline-flex items-center gap-1 shadow-2xs"
-                        >
-                          <span>Manage</span>
-                          <ChevronRight className="w-3.5 h-3.5" />
-                        </button>
+                        {req.quoteStatus === "accepted" && !req.assignedContractor ? (
+                          <button
+                            onClick={() => handleOpenModal(req)}
+                            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-xs transition-colors cursor-pointer inline-flex items-center gap-1 shadow-xs"
+                          >
+                            <span>Assign</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleOpenModal(req)}
+                            className="px-3.5 py-1.5 bg-[#0891A2] hover:bg-[#067a88] text-white rounded-xl font-semibold text-xs transition-colors cursor-pointer inline-flex items-center gap-1 shadow-2xs"
+                          >
+                            <span>Manage</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -417,12 +709,12 @@ export function ServiceRequestsView() {
                     }}
                   >
                     <SelectTrigger className="h-7 w-[68px] text-xs rounded-lg bg-slate-50 border-slate-200 font-medium">
-                      <SelectValue placeholder="5" />
+                      <SelectValue placeholder="10" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="5">5</SelectItem>
                       <SelectItem value="10">10</SelectItem>
-                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="25">25</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -506,6 +798,21 @@ export function ServiceRequestsView() {
 
             {/* Modal Form */}
             <form onSubmit={handleSaveModal} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto no-scrollbar">
+              {/* Highlight if client accepted quote */}
+              {selectedRequest.quoteStatus === "accepted" && (
+                <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div className="text-xs">
+                    <p className="font-bold text-emerald-950">
+                      Client Accepted Quote ({selectedRequest.quotedPrice})
+                    </p>
+                    <p className="text-emerald-700 text-[11px] mt-0.5">
+                      The client accepted this quotation. Assign a verified contractor below and set job status to &quot;In Progress&quot;.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Customer and Location Info Card */}
               <div className="p-3.5 bg-slate-50/80 border border-slate-100 rounded-xl text-xs space-y-2">
                 <div className="flex items-start justify-between gap-2">
@@ -537,6 +844,22 @@ export function ServiceRequestsView() {
                 </p>
               </div>
 
+              {/* Uploaded Issue Photo by Customer */}
+              {selectedRequest.photos && selectedRequest.photos.length > 0 && (
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                    Uploaded Issue Photo
+                  </label>
+                  <div className="relative w-full h-44 rounded-xl overflow-hidden border border-slate-200 bg-slate-950 flex items-center justify-center">
+                    <img
+                      src={selectedRequest.photos[0]}
+                      alt="Uploaded problem issue"
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Form Input 1: Assign Contractor */}
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1.5">
@@ -544,7 +867,14 @@ export function ServiceRequestsView() {
                 </label>
                 <Select
                   value={editContractor || "none"}
-                  onValueChange={(val) => setEditContractor(val === "none" ? "" : val)}
+                  onValueChange={(val) => {
+                    const contractorName = val === "none" ? "" : val;
+                    setEditContractor(contractorName);
+                    // If assigning contractor and quote was accepted, auto-switch status to In Progress
+                    if (contractorName && selectedRequest.quoteStatus === "accepted" && editStatus === "Pending") {
+                      setEditStatus("In Progress");
+                    }
+                  }}
                 >
                   <SelectTrigger className="h-9 text-xs rounded-xl bg-white border-slate-200">
                     <SelectValue placeholder="Select Verified Contractor" />
@@ -594,7 +924,7 @@ export function ServiceRequestsView() {
                     <SelectContent>
                       <SelectItem value="Pending">Pending Review</SelectItem>
                       <SelectItem value="Quoted">Quoted (Sent to Client)</SelectItem>
-                      <SelectItem value="In Progress">In Progress</SelectItem>
+                      <SelectItem value="In Progress">In Progress (Active Job)</SelectItem>
                       <SelectItem value="Completed">Completed</SelectItem>
                       <SelectItem value="Cancelled">Cancelled</SelectItem>
                     </SelectContent>
@@ -628,12 +958,21 @@ export function ServiceRequestsView() {
 
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#0891A2] hover:bg-[#067a88] text-white text-xs font-medium transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  className={`px-5 py-2 rounded-xl text-white text-xs font-medium transition-all shadow-xs flex items-center gap-1.5 cursor-pointer ${
+                    editStatus === "In Progress" && editContractor
+                      ? "bg-emerald-600 hover:bg-emerald-700"
+                      : "bg-[#0891A2] hover:bg-[#067a88]"
+                  }`}
                 >
                   {isSavedSuccess ? (
                     <>
                       <Check className="w-3.5 h-3.5" />
-                      <span>Updated!</span>
+                      <span>Updated &amp; Dispatched!</span>
+                    </>
+                  ) : editStatus === "In Progress" && editContractor ? (
+                    <>
+                      <UserCheck className="w-3.5 h-3.5" />
+                      <span>Assign &amp; Start Job</span>
                     </>
                   ) : (
                     <>

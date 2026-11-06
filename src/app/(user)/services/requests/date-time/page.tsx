@@ -1,27 +1,42 @@
 "use client";
 
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChooseDateTimeScreen } from "@/components/services/ChooseDateTimeScreen";
 import { MobileContainer } from "@/components/shared/MobileContainer";
+import { serviceRequestApi } from "@/lib/api";
 
 function DateTimeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const id = searchParams.get("id") || "req-1";
+  const id = searchParams.get("id") || "";
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("userRole", "service");
+  const handleConfirmAppointment = async (appointment: { date: string; time: string }) => {
+    if (id && id.length > 5) {
+      try {
+        await serviceRequestApi.updateAppointment(id, appointment);
+      } catch (err) {
+        console.warn("Could not save appointment to backend:", err);
+      }
     }
-  }, []);
+    if (id) {
+      router.push(`/services/requests/details?id=${encodeURIComponent(id)}`);
+    } else {
+      router.push("/services/requests");
+    }
+  };
 
   return (
     <ChooseDateTimeScreen
-      onBack={() => router.push(`/services/requests/details?id=${encodeURIComponent(id)}&role=service`)}
-      onConfirmAppointment={() => {
-        router.push("/services/requests?role=service");
+      onBack={() => {
+        if (id) {
+          router.push(`/services/requests/details?id=${encodeURIComponent(id)}`);
+        } else {
+          router.push("/services/requests");
+        }
       }}
+      onConfirmAppointment={handleConfirmAppointment}
+      showSuccessModal={true}
       showStatusBar={true}
     />
   );

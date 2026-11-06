@@ -38,11 +38,70 @@ import {
 } from "@/components/ui/select";
 import { ServiceRequest, Contractor, RequestStatus } from "./types";
 import { INITIAL_SERVICE_REQUESTS, CONTRACTORS_LIST } from "./adminMockData";
+import { adminApi } from "@/lib/api";
 
 export function AdminDashboard() {
   const [requests, setRequests] = useState<ServiceRequest[]>(INITIAL_SERVICE_REQUESTS);
   const [contractors] = useState<Contractor[]>(CONTRACTORS_LIST);
   const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null);
+
+  // Fetch live requests from backend
+  useEffect(() => {
+    let isMounted = true;
+    adminApi
+      .getAllRequests()
+      .then((res: any) => {
+        if (!isMounted) return;
+        const raw = Array.isArray(res) ? res : res?.data || [];
+        if (Array.isArray(raw) && raw.length > 0) {
+          const mapped: ServiceRequest[] = raw.map((item: any) => ({
+            id: item._id,
+            referenceNo: `#SR-${String(item._id).slice(-5).toUpperCase()}`,
+            title: item.issue || `${item.serviceCategory} issue`,
+            category: item.serviceCategory || "General",
+            user: {
+              name: item.userId?.name || item.contactName || "Guest User",
+              role:
+                item.userId?.role === "tenant"
+                  ? "Tenant"
+                  : item.userId?.role === "landlord"
+                  ? "Landlord"
+                  : "Service Client",
+              phone: item.userId?.phone || item.contactPhone || "Not provided",
+              email: item.userId?.email || item.contactEmail || "guest@househeaven.com",
+              avatar: item.userId?.profile,
+            },
+            address: item.address || "Armagh, UK",
+            postcode: item.postcode || "",
+            requestedDate:
+              item.appointment?.date ||
+              new Date(item.createdAt || Date.now()).toLocaleDateString(),
+            requestedTime: item.appointment?.time || "10:00 AM",
+            status: (item.status as RequestStatus) || "Pending",
+            priority: "Medium",
+            description: item.description || "",
+            quotedPrice: item.quotation?.quotedAmount
+              ? `£${item.quotation.quotedAmount}`
+              : item.quotation?.estimatedPrice || "£75–£100",
+            assignedContractor:
+              item.assignedContractor?.name ||
+              (typeof item.assignedContractor === "string"
+                ? item.assignedContractor
+                : undefined),
+            photos: item.photos || [],
+            createdAt: new Date(item.createdAt || Date.now())
+              .toISOString()
+              .split("T")[0],
+            source: "Services Hub",
+          }));
+          setRequests(mapped);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Filter states
   const [activeTab, setActiveTab] = useState<"requests" | "contractors" | "escalations">("requests");
@@ -103,7 +162,7 @@ export function AdminDashboard() {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
 
   // Reset page when filters or search change
   useEffect(() => {
@@ -127,22 +186,45 @@ export function AdminDashboard() {
     setIsModalOpen(true);
   };
 
-  const handleSaveModal = (e: React.FormEvent) => {
+  const handleSaveModal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRequest) return;
+
+    const newQuotedPrice = editPrice.trim()
+      ? editPrice.startsWith("£")
+        ? editPrice
+        : `£${editPrice}`
+      : selectedRequest.quotedPrice;
 
     setRequests((prev) =>
       prev.map((r) =>
         r.id === selectedRequest.id
           ? {
               ...r,
-              quotedPrice: editPrice.trim() ? (editPrice.startsWith("£") ? editPrice : `£${editPrice}`) : r.quotedPrice,
+              quotedPrice: newQuotedPrice,
               assignedContractor: editContractor,
               status: editStatus,
             }
           : r
       )
     );
+
+    try {
+      await adminApi.updateRequestStatus(selectedRequest.id, editStatus);
+      if (editPrice.trim()) {
+        const numeric = parseFloat(editPrice.replace(/[^0-9.]/g, ""));
+        await adminApi.updateRequestQuote(selectedRequest.id, {
+          status: editStatus === "Quoted" || (numeric && numeric > 0) ? "received" : "pending",
+          quotedAmount: isNaN(numeric) ? undefined : numeric,
+          quoteNotes: adminNote || undefined,
+        });
+      }
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("serviceRequestsUpdated"));
+      }
+    } catch (err) {
+      console.warn("Backend update error:", err);
+    }
 
     setIsSavedSuccess(true);
     setTimeout(() => {
@@ -560,12 +642,12 @@ export function AdminDashboard() {
                         }}
                       >
                         <SelectTrigger className="h-7 w-[68px] text-[11px] rounded-lg bg-slate-50 border-slate-200">
-                          <SelectValue placeholder="5" />
+                          <SelectValue placeholder="10" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="5">5</SelectItem>
                           <SelectItem value="10">10</SelectItem>
-                          <SelectItem value="20">20</SelectItem>
+                          <SelectItem value="25">25</SelectItem>
+                          <SelectItem value="50">50</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

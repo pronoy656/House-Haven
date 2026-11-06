@@ -4,9 +4,18 @@ import React, { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { LandlordProfileFlowScreen } from "@/components/landlord/LandlordProfileFlowScreen";
 import { MobileContainer } from "@/components/shared/MobileContainer";
+import { authApi } from "@/lib/api";
 
 export default function LandlordProfilePage() {
   const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await authApi.logout();
+    } finally {
+      router.push("/login");
+    }
+  };
 
   return (
     <MobileContainer>
@@ -18,7 +27,7 @@ export default function LandlordProfilePage() {
           onNavigateToProperties={() => router.push("/landlord/properties")}
           onNavigateToApplications={() => router.push("/landlord/applications")}
           onNavigateToNotifications={() => router.push("/landlord/notifications")}
-          onLogout={() => router.push("/login")}
+          onLogout={handleLogout}
           showStatusBar={true}
         />
       </Suspense>

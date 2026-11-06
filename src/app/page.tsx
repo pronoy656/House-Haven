@@ -16,6 +16,7 @@ export default function HomePage() {
         onSlideChange={(newSlide) => setSlide(newSlide)}
         onSignUp={() => router.push("/choose-role")}
         onSignIn={() => router.push("/login")}
+        onExploreGuest={() => router.push("/services")}
         showStatusBar={true}
       />
     </MobileContainer>

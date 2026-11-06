@@ -1,5 +1,16 @@
 export type RequestStatus = "Pending" | "Quoted" | "In Progress" | "Completed" | "Cancelled";
+export type QuoteStatus = "pending" | "received" | "accepted" | "declined";
 export type RequestPriority = "Low" | "Medium" | "High" | "Urgent";
+
+export interface AssignedContractorDetails {
+  id?: string;
+  name: string;
+  trade?: string;
+  phone?: string;
+  email?: string;
+  rating?: number;
+  company?: string;
+}
 
 export interface ServiceRequest {
   id: string;
@@ -18,10 +29,14 @@ export interface ServiceRequest {
   requestedDate: string;
   requestedTime: string;
   status: RequestStatus;
+  quoteStatus?: QuoteStatus;
   priority: RequestPriority;
   description: string;
   quotedPrice?: string;
+  quoteNotes?: string;
   assignedContractor?: string;
+  contractorDetails?: AssignedContractorDetails;
+  photos?: string[];
   createdAt: string;
   source: "Services Hub" | "Landlord Escalation";
 }

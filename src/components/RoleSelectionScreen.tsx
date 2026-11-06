@@ -156,6 +156,17 @@ export function RoleSelectionScreen({
           </button>
         </div>
 
+        {/* Guest Explore Quick Link */}
+        <div className="text-center pt-0.5">
+          <Link
+            href="/services"
+            className="text-xs font-medium text-slate-500 hover:text-[#0891A2] transition-colors inline-flex items-center gap-1"
+          >
+            <span>Just browsing?</span>
+            <span className="font-semibold underline">Explore Services as Guest &rarr;</span>
+          </Link>
+        </div>
+
         {/* Admin Portal Quick Link */}
         <div className="text-center pt-0.5">
           <Link

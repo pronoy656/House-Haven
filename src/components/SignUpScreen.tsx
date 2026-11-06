@@ -6,6 +6,7 @@ import { HouseHavenLogo } from "@/components/shared/HouseHavenLogo";
 import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
 import { Button } from "@/components/shared/Button";
 import { InputField } from "@/components/shared/InputField";
+import { authApi } from "@/lib/api";
 
 interface SignUpScreenProps {
   selectedRole?: string;
@@ -25,17 +26,33 @@ export function SignUpScreen({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    setErrorMessage(null);
+
+    try {
+      await authApi.signup({
+        name,
+        email,
+        password,
+        phone: phone || undefined,
+        role: selectedRole,
+      });
+
       if (onSignUpSuccess) {
-        onSignUpSuccess({ name: name || "Alex Morgan", email: email || "alex@example.com" });
+        onSignUpSuccess({ name: name || "User", email });
       }
-    }, 500);
+    } catch (err: any) {
+      console.error("Sign up error:", err);
+      setErrorMessage(err.message || "Failed to create account. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -71,13 +88,19 @@ export function SignUpScreen({
           </p>
         </div>
 
+        {errorMessage && (
+          <div className="w-full mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl text-center">
+            {errorMessage}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="w-full space-y-3.5">
           <InputField
             label="Full Name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your full name"
+            placeholder="John Doe"
             required
           />
 
@@ -86,8 +109,16 @@ export function SignUpScreen({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter email"
+            placeholder="name@example.com"
             required
+          />
+
+          <InputField
+            label="Phone Number"
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+44 7911 123456"
           />
 
           <InputField
@@ -95,34 +126,31 @@ export function SignUpScreen({
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Create password"
+            placeholder="Minimum 6 characters"
             required
           />
 
-          <div className="pt-3">
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              fullWidth
-              isLoading={isLoading}
-              className="h-12 text-sm font-semibold tracking-wide border-0 shadow-none outline-none"
-            >
-              Sign Up
-            </Button>
-          </div>
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            className="w-full mt-2"
+            disabled={isLoading}
+          >
+            {isLoading ? "Creating Account..." : "Sign Up"}
+          </Button>
         </form>
-      </div>
 
-      <div className="text-center text-xs text-slate-600 font-normal pt-2">
-        Already have an account?{" "}
-        <button
-          type="button"
-          onClick={onNavigateToSignIn}
-          className="font-semibold text-[#0891A2] hover:underline cursor-pointer transition-colors"
-        >
-          Sign in
-        </button>
+        <div className="mt-6 text-center text-xs text-slate-500 font-normal">
+          Already have an account?{" "}
+          <button
+            type="button"
+            onClick={onNavigateToSignIn}
+            className="text-slate-900 font-semibold hover:underline"
+          >
+            Sign In
+          </button>
+        </div>
       </div>
     </div>
   );

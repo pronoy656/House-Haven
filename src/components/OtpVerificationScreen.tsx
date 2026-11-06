@@ -3,8 +3,7 @@
 import React, { useState, useRef } from "react";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/shared/Button";
-import { InputField } from "@/components/shared/InputField";
-import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
+import { authApi } from "@/lib/api";
 
 interface OtpVerificationScreenProps {
   email?: string;
@@ -17,16 +16,16 @@ export function OtpVerificationScreen({
   email = "alex@example.com",
   onBack,
   onVerifySuccess,
-  showStatusBar = true,
 }: OtpVerificationScreenProps) {
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [timer, setTimer] = useState(45);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (value: string, index: number) => {
     if (value.length > 1) {
-      // Pasting full code
       const pasted = value.slice(0, 6).split("");
       const newOtp = [...otp];
       pasted.forEach((char, i) => {
@@ -42,7 +41,6 @@ export function OtpVerificationScreen({
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // Auto focus next
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -54,15 +52,46 @@ export function OtpVerificationScreen({
     }
   };
 
-  const handleVerify = (e: React.FormEvent) => {
+  const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
+    const code = otp.join("");
+    if (code.length < 4) {
+      setErrorMessage("Please enter the complete verification code.");
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
+    setErrorMessage(null);
+
+    try {
+      await authApi.verifyAccount({
+        email,
+        oneTimeCode: code,
+      });
+
+      setInfoMessage("Verification successful! Redirecting to login...");
+      setTimeout(() => {
+        if (onVerifySuccess) {
+          onVerifySuccess();
+        }
+      }, 700);
+    } catch (err: any) {
+      console.error("Verification error:", err);
+      setErrorMessage(err.message || "Invalid or expired verification code.");
+    } finally {
       setIsLoading(false);
-      if (onVerifySuccess) {
-        onVerifySuccess();
-      }
-    }, 600);
+    }
+  };
+
+  const handleResend = async () => {
+    try {
+      await authApi.resendOtp(email);
+      setInfoMessage("A new verification code has been generated.");
+      setTimer(45);
+      setTimeout(() => setInfoMessage(null), 4000);
+    } catch (err: any) {
+      setErrorMessage(err.message || "Failed to resend code.");
+    }
   };
 
   return (
@@ -88,76 +117,78 @@ export function OtpVerificationScreen({
 
       {/* Main Content */}
       <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col justify-center items-center px-1 py-4">
-        {/* Shield Icon container */}
-        <div className="w-16 h-16 rounded-2xl bg-[#0891A2]/10 text-[#0891A2] flex items-center justify-center mb-6 shadow-sm">
-          <ShieldCheck className="w-8 h-8 stroke-[2.2]" />
+        {/* Verification Icon Badge */}
+        <div className="w-16 h-16 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-600 mb-6 shadow-xs">
+          <ShieldCheck className="w-8 h-8 stroke-[1.8]" />
         </div>
 
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-950">
-            Verify Your Email
-          </h1>
-          <p className="text-xs text-slate-500 mt-2 max-w-[280px] leading-relaxed">
-            Enter the 6-digit verification code sent to <br />
-            <strong className="text-slate-800 font-medium">{email}</strong>
-          </p>
-        </div>
+        {/* Heading & Subtitle */}
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 text-center">
+          Verify Your Email
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 mt-2 text-center max-w-[280px]">
+          Please enter the 6-digit code sent to{" "}
+          <span className="font-semibold text-slate-800 break-all">{email}</span>
+        </p>
 
-        {/* 6-Digit OTP inputs */}
-        <form onSubmit={handleVerify} className="w-full space-y-6">
-          <div className="flex justify-between gap-2 max-w-[320px] mx-auto">
-            {otp.map((digit, index) => (
-              <InputField
-                key={index}
+        {errorMessage && (
+          <div className="w-full mt-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl text-center">
+            {errorMessage}
+          </div>
+        )}
+
+        {infoMessage && (
+          <div className="w-full mt-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-xl text-center">
+            {infoMessage}
+          </div>
+        )}
+
+        {/* OTP Input Fields */}
+        <form onSubmit={handleVerify} className="w-full mt-8">
+          <div className="flex justify-center gap-2 sm:gap-3">
+            {otp.map((digit, idx) => (
+              <input
+                key={idx}
                 ref={(el) => {
-                  inputRefs.current[index] = el;
+                  inputRefs.current[idx] = el;
                 }}
                 type="text"
                 inputMode="numeric"
                 maxLength={6}
                 value={digit}
-                onChange={(e) => handleChange(e.target.value.replace(/\D/g, ""), index)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-                containerClassName="w-11"
-                className="w-11 h-13 text-center text-lg font-bold px-0 rounded-xl"
+                onChange={(e) => handleChange(e.target.value, idx)}
+                onKeyDown={(e) => handleKeyDown(e, idx)}
+                className={`w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-xl border bg-slate-50/50 transition-all outline-none ${
+                  digit
+                    ? "border-teal-500 text-slate-900 bg-white ring-2 ring-teal-500/20"
+                    : "border-slate-200 text-slate-900 focus:border-teal-500 focus:bg-white focus:ring-2 focus:ring-teal-500/20"
+                }`}
               />
             ))}
           </div>
 
-          {/* Resend Timer */}
-          <div className="text-center text-xs text-slate-500 pt-1">
-            Didn&apos;t receive the code?{" "}
-            {timer > 0 ? (
-              <span className="font-semibold text-slate-700">Resend in 00:{timer < 10 ? `0${timer}` : timer}</span>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setTimer(45)}
-                className="font-semibold text-[#0891A2] hover:underline cursor-pointer"
-              >
-                Resend Code
-              </button>
-            )}
-          </div>
-
-          {/* Verify Button */}
-          <div className="pt-4">
-            <Button
-              type="submit"
-              variant="primary"
-              isLoading={isLoading}
-              className="h-12 font-semibold text-sm tracking-wide w-full"
-            >
-              Verify &amp; Continue
-            </Button>
-          </div>
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            className="w-full mt-8"
+            disabled={isLoading}
+          >
+            {isLoading ? "Verifying..." : "Verify & Continue"}
+          </Button>
         </form>
-      </div>
 
-      {/* Footer */}
-      <div className="shrink-0 text-center text-xs text-slate-400 pt-2">
-        Secured by House Haven Identity
+        {/* Resend Code Section */}
+        <div className="mt-6 text-center text-xs text-slate-500">
+          Didn't receive the code?{" "}
+          <button
+            type="button"
+            onClick={handleResend}
+            className="font-semibold text-teal-600 hover:text-teal-700 hover:underline cursor-pointer"
+          >
+            Resend Code
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { ArrowRight, Compass } from "lucide-react";
 import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
 import { Button } from "@/components/shared/Button";
 
 interface SplashScreenProps {
   onSignUp?: () => void;
   onSignIn?: () => void;
+  onExploreGuest?: () => void;
   onSlideChange?: (slide: 1 | 2) => void;
   initialSlide?: 1 | 2;
   showStatusBar?: boolean;
@@ -16,6 +18,7 @@ interface SplashScreenProps {
 export function SplashScreen({
   onSignUp,
   onSignIn,
+  onExploreGuest,
   onSlideChange,
   initialSlide = 1,
   showStatusBar = true,
@@ -112,8 +115,8 @@ export function SplashScreen({
               </p>
             </div>
 
-            {/* Get Started Button advances to Slide 2 */}
-            <div className="pt-1">
+            {/* Slide 1 Actions */}
+            <div className="space-y-2.5 pt-1">
               <Button
                 variant="primary"
                 onClick={handleGoToSlide2}
@@ -121,6 +124,15 @@ export function SplashScreen({
               >
                 Get Started
               </Button>
+              <button
+                type="button"
+                onClick={onExploreGuest}
+                className="w-full h-11 px-4 text-xs font-semibold text-white/95 hover:text-white flex items-center justify-center gap-2 transition-all cursor-pointer bg-white/10 hover:bg-white/15 active:scale-[0.99] backdrop-blur-md rounded-2xl border border-white/20 shadow-xs"
+              >
+                <Compass className="w-4 h-4 text-[#0891A2]" />
+                <span>Explore Services as Guest</span>
+                <ArrowRight className="w-3.5 h-3.5 text-white/60" />
+              </button>
             </div>
           </div>
         ) : (
@@ -138,7 +150,7 @@ export function SplashScreen({
             </div>
 
             {/* Slide 2 Buttons: Sign Up & Sign in */}
-            <div className="space-y-3 pt-1">
+            <div className="space-y-2.5 pt-1">
               <Button
                 variant="primary"
                 onClick={onSignUp}
@@ -153,6 +165,14 @@ export function SplashScreen({
               >
                 Sign in
               </Button>
+              <button
+                type="button"
+                onClick={onExploreGuest}
+                className="w-full py-2 text-xs font-medium text-slate-300 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <span>Or explore all services as Guest</span>
+                <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+              </button>
             </div>
           </div>
         )}

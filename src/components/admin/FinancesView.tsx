@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   PoundSterling,
   Search,
@@ -30,7 +30,12 @@ export function FinancesView() {
   const [statusFilter, setStatusFilter] = useState<string>("All");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
+  const [pageSize, setPageSize] = useState(10);
+
+  // Reset page on filter/search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [typeFilter, statusFilter, searchQuery, pageSize]);
 
   // 4 Metrics
   const metrics = useMemo(() => {
@@ -64,7 +69,7 @@ export function FinancesView() {
   const paginated = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     return filtered.slice(start, start + pageSize);
-  }, [filtered, currentPage]);
+  }, [filtered, currentPage, pageSize]);
 
   const getStatusBadge = (status: AdminTransaction["status"]) => {
     switch (status) {
@@ -106,7 +111,7 @@ export function FinancesView() {
 
       {/* Main Body */}
       <main className="p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 flex-1 w-full max-w-full">
-        {/* 4 Stat Cards */}
+        {/* 4 Stat Cards - Uniform Clean Slate Borders */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
           <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
@@ -122,44 +127,44 @@ export function FinancesView() {
             </p>
           </div>
 
-          <div className="p-4 bg-white border border-emerald-200 bg-emerald-50/20 rounded-2xl shadow-2xs">
+          <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Rent Collected
               </span>
-              <span className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700">
+              <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
                 <Building className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-2xl font-bold text-emerald-900 mt-2">
+            <p className="text-2xl font-bold text-slate-900 mt-2">
               £{metrics.rentCollected.toLocaleString()}
             </p>
           </div>
 
-          <div className="p-4 bg-white border border-teal-200 bg-teal-50/20 rounded-2xl shadow-2xs">
+          <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-teal-700 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Platform Fees
               </span>
-              <span className="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center text-teal-700">
+              <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
                 <ArrowUpRight className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-2xl font-bold text-teal-900 mt-2">
+            <p className="text-2xl font-bold text-slate-900 mt-2">
               £{metrics.platformFees.toFixed(2)}
             </p>
           </div>
 
-          <div className="p-4 bg-white border border-amber-200 bg-amber-50/20 rounded-2xl shadow-2xs">
+          <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Pending Transactions
               </span>
-              <span className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700">
+              <span className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
                 <Clock className="w-4 h-4" />
               </span>
             </div>
-            <p className="text-2xl font-bold text-amber-900 mt-2">{metrics.pendingCount}</p>
+            <p className="text-2xl font-bold text-slate-900 mt-2">{metrics.pendingCount}</p>
           </div>
         </div>
 
@@ -316,31 +321,69 @@ export function FinancesView() {
           </div>
 
           {/* Pagination Footer */}
-          <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <span className="text-xs text-slate-500">
-              Showing <strong className="text-slate-800">{paginated.length}</strong> of{" "}
-              <strong className="text-slate-800">{filtered.length}</strong> transactions
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                Previous
-              </button>
-              <span className="text-xs font-medium text-slate-600 px-2">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                Next
-              </button>
+          {filtered.length > 0 && (
+            <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+              <div className="flex items-center gap-3">
+                <span>
+                  Showing <strong className="text-slate-900 font-bold">{(currentPage - 1) * pageSize + 1}</strong> to{" "}
+                  <strong className="text-slate-900 font-bold">{Math.min(currentPage * pageSize, filtered.length)}</strong> of{" "}
+                  <strong className="text-slate-900 font-bold">{filtered.length}</strong> transactions
+                </span>
+                <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200">
+                  <span className="text-xs text-slate-400">Rows:</span>
+                  <Select
+                    value={String(pageSize)}
+                    onValueChange={(val) => {
+                      setPageSize(Number(val));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="h-7 w-[68px] text-xs rounded-lg bg-white border-slate-200 font-medium">
+                      <SelectValue placeholder="10" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="25">25</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage <= 1}
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer flex items-center gap-1 font-semibold text-xs"
+                >
+                  Previous
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    type="button"
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`w-7 h-7 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                      currentPage === pageNum
+                        ? "bg-[#0891A2] text-white shadow-2xs"
+                        : "hover:bg-slate-200 text-slate-700"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage >= totalPages}
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer flex items-center gap-1 font-semibold text-xs"
+                >
+                  Next
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
     </div>

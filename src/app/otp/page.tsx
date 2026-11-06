@@ -16,16 +16,10 @@ function OtpContent() {
       email={email}
       onBack={() => router.push(`/signup?role=${role}`)}
       onVerifySuccess={() => {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("userRole", role);
-        }
-        if (role === "services" || role === "service") {
-          router.push("/services?role=service");
-        } else if (role === "tenant") {
-          router.push("/tenant/onboarding");
-        } else {
-          router.push("/landlord/dashboard");
-        }
+        // Redirect to login page with verified notice and prefilled email
+        router.push(
+          `/login?verified=true&email=${encodeURIComponent(email)}&role=${encodeURIComponent(role)}`
+        );
       }}
       showStatusBar={true}
     />

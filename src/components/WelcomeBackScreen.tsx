@@ -1,36 +1,56 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { CheckCircle2 } from "lucide-react";
 import { HouseHavenLogo } from "@/components/shared/HouseHavenLogo";
 import { Button } from "@/components/shared/Button";
 import { InputField } from "@/components/shared/InputField";
+import { authApi } from "@/lib/api";
 
 interface WelcomeBackScreenProps {
+  initialEmail?: string;
+  isVerified?: boolean;
   onNavigateToSignUp?: () => void;
   onLoginSuccess?: () => void;
   showStatusBar?: boolean;
 }
 
 export function WelcomeBackScreen({
+  initialEmail = "",
+  isVerified = false,
   onNavigateToSignUp,
   onLoginSuccess,
 }: WelcomeBackScreenProps) {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (initialEmail) {
+      setEmail(initialEmail);
+    }
+  }, [initialEmail]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    setErrorMessage(null);
+
+    try {
+      await authApi.login({ email, password });
       setToastMessage("Signed in successfully to House Haven!");
       setTimeout(() => {
         setToastMessage(null);
         onLoginSuccess?.();
       }, 500);
-    }, 600);
+    } catch (err: any) {
+      console.error("Login error:", err);
+      setErrorMessage(err.message || "Failed to sign in. Please check credentials.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -48,6 +68,21 @@ export function WelcomeBackScreen({
             Log in to continue to your account.
           </p>
         </div>
+
+        {isVerified && (
+          <div className="w-full mb-4 p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2.5 animate-in fade-in duration-200">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span className="font-medium">
+              Account verified successfully! Please sign in with your password to continue.
+            </span>
+          </div>
+        )}
+
+        {errorMessage && (
+          <div className="w-full mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl text-center">
+            {errorMessage}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="w-full space-y-4">
           <InputField
@@ -68,37 +103,34 @@ export function WelcomeBackScreen({
             required
           />
 
-          <div className="pt-3">
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              fullWidth
-              isLoading={isLoading}
-              className="h-12 font-semibold text-sm tracking-wide"
-            >
-              Sign in
-            </Button>
-          </div>
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            className="w-full mt-4"
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing in..." : "Sign In"}
+          </Button>
         </form>
 
-        {toastMessage && (
-          <div className="mt-4 px-4 py-2 bg-emerald-50 text-emerald-800 text-xs rounded-full border border-emerald-200 animate-fade-in font-medium">
-            {toastMessage}
-          </div>
-        )}
+        <div className="mt-8 text-center text-xs text-slate-500 font-normal">
+          Don't have an account?{" "}
+          <button
+            type="button"
+            onClick={onNavigateToSignUp}
+            className="text-slate-900 font-semibold hover:underline"
+          >
+            Sign Up
+          </button>
+        </div>
       </div>
 
-      <div className="text-center text-xs text-slate-600 font-normal pt-2">
-        Didn&apos;t have an account?{" "}
-        <button
-          type="button"
-          onClick={onNavigateToSignUp}
-          className="font-semibold text-[#0891A2] hover:underline cursor-pointer transition-colors"
-        >
-          Sign up
-        </button>
-      </div>
+      {toastMessage && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs py-2 px-4 rounded-full shadow-lg">
+          {toastMessage}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,35 +1,26 @@
 "use client";
 
-import React, { Suspense, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import React, { Suspense } from "react";
+import { useRouter } from "next/navigation";
 import { ProfileScreen } from "@/components/services/ProfileScreen";
 import { MobileContainer } from "@/components/shared/MobileContainer";
+import { authApi } from "@/lib/api";
 
 function ServicesProfileContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const role = searchParams.get("role");
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("userRole", "service");
+  const handleLogout = async () => {
+    try {
+      await authApi.logout();
+    } finally {
+      router.push("/login");
     }
-    if (role !== "service" && role !== "services") {
-      router.replace("/services/profile?role=service");
-    }
-  }, [role, router]);
-
-  const handleLogout = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("userRole");
-    }
-    router.push("/login");
   };
 
   return (
     <ProfileScreen
-      onNavigateToServices={() => router.push("/services?role=service")}
-      onNavigateToRequests={() => router.push("/services/requests?role=service")}
+      onNavigateToServices={() => router.push("/services")}
+      onNavigateToRequests={() => router.push("/services/requests")}
       onLogout={handleLogout}
       showStatusBar={true}
     />

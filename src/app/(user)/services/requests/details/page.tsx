@@ -8,23 +8,17 @@ import { MobileContainer } from "@/components/shared/MobileContainer";
 function RequestDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const role = searchParams.get("role");
-  const id = searchParams.get("id") || "req-1";
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("userRole", "service");
-    }
-  }, []);
+  const id = searchParams.get("id") || "";
 
   return (
     <RequestDetailsScreen
-      onBack={() => router.push("/services/requests?role=service")}
-      onNavigateToQuote={() => router.push(`/services/requests/quote?id=${encodeURIComponent(id)}&role=service`)}
-      onNavigateToDateTime={() => router.push(`/services/requests/date-time?id=${encodeURIComponent(id)}&role=service`)}
-      onNavigateToServices={() => router.push("/services?role=service")}
-      onNavigateToRequests={() => router.push("/services/requests?role=service")}
-      onNavigateToProfile={() => router.push("/services/profile?role=service")}
+      requestId={id}
+      onBack={() => router.push("/services/requests")}
+      onNavigateToQuote={() => router.push(`/services/requests/quote?id=${encodeURIComponent(id)}`)}
+      onNavigateToDateTime={() => router.push(`/services/requests/date-time?id=${encodeURIComponent(id)}`)}
+      onNavigateToServices={() => router.push("/services")}
+      onNavigateToRequests={() => router.push("/services/requests")}
+      onNavigateToProfile={() => router.push("/services/profile")}
       showStatusBar={true}
     />
   );

@@ -8,19 +8,32 @@ import { MobileContainer } from "@/components/shared/MobileContainer";
 function ServiceQuoteContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const id = searchParams.get("id") || "req-1";
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("userRole", "service");
-    }
-  }, []);
+  const id = searchParams.get("id") || "";
 
   return (
     <ServiceQuoteScreen
-      onBack={() => router.push(`/services/requests/details?id=${encodeURIComponent(id)}&role=service`)}
-      onAcceptQuote={() => router.push("/services/requests?role=service")}
-      onDeclineQuote={() => router.push("/services/requests?role=service")}
+      requestId={id}
+      onBack={() => {
+        if (id) {
+          router.push(`/services/requests/details?id=${encodeURIComponent(id)}`);
+        } else {
+          router.push("/services/requests");
+        }
+      }}
+      onAcceptQuote={() => {
+        if (id) {
+          router.push(`/services/requests/details?id=${encodeURIComponent(id)}`);
+        } else {
+          router.push("/services/requests");
+        }
+      }}
+      onDeclineQuote={() => {
+        if (id) {
+          router.push(`/services/requests/details?id=${encodeURIComponent(id)}`);
+        } else {
+          router.push("/services/requests");
+        }
+      }}
       showStatusBar={true}
     />
   );
