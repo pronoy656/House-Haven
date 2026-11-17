@@ -28,6 +28,7 @@ import {
 import { ServiceRequest, Contractor, RequestStatus, QuoteStatus } from "./types";
 import { INITIAL_SERVICE_REQUESTS, CONTRACTORS_LIST } from "./adminMockData";
 import { adminApi } from "@/lib/api";
+import { toast } from "@/components/shared/Toast";
 
 export function ServiceRequestsView() {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
@@ -317,6 +318,9 @@ export function ServiceRequestsView() {
     }
 
     setIsSavedSuccess(true);
+    toast.success("Request updated successfully!", {
+      description: `Reference #${selectedRequest.referenceNo || selectedRequest.id.slice(-6).toUpperCase()} updated.`,
+    });
     setTimeout(() => {
       setIsModalOpen(false);
       setIsSavedSuccess(false);

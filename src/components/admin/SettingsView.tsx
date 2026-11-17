@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { toast } from "@/components/shared/Toast";
 import {
   Settings,
   ShieldCheck,
@@ -27,6 +28,9 @@ export function SettingsView() {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     setSavedSuccess(true);
+    toast.success("Platform settings saved successfully!", {
+      description: "Commission, dispatch SLA, and contact rules updated.",
+    });
     setTimeout(() => setSavedSuccess(false), 3000);
   };
 

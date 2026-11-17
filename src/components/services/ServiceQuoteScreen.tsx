@@ -17,6 +17,7 @@ import { Button } from "@/components/shared/Button";
 import { InputField } from "@/components/shared/InputField";
 import Image from "next/image";
 import { serviceRequestApi } from "@/lib/api";
+import { toast } from "@/components/shared/Toast";
 
 interface ServiceQuoteScreenProps {
   requestId?: string;
@@ -78,6 +79,9 @@ export function ServiceQuoteScreen({
           : prev
       );
       setActionFeedback("Quote accepted! The contractor has been scheduled.");
+      toast.success("Quote accepted successfully!", {
+        description: "The operations desk has been notified to dispatch the contractor.",
+      });
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("serviceRequestsUpdated"));
       }
@@ -108,6 +112,9 @@ export function ServiceQuoteScreen({
           : prev
       );
       setActionFeedback("Quote declined.");
+      toast.info("Quote declined", {
+        description: "You have declined this service quotation.",
+      });
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("serviceRequestsUpdated"));
       }

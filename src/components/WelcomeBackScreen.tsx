@@ -6,6 +6,7 @@ import { HouseHavenLogo } from "@/components/shared/HouseHavenLogo";
 import { Button } from "@/components/shared/Button";
 import { InputField } from "@/components/shared/InputField";
 import { authApi } from "@/lib/api";
+import { toast } from "@/components/shared/Toast";
 
 interface WelcomeBackScreenProps {
   initialEmail?: string;
@@ -24,7 +25,6 @@ export function WelcomeBackScreen({
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,12 +39,22 @@ export function WelcomeBackScreen({
     setErrorMessage(null);
 
     try {
-      await authApi.login({ email, password });
-      setToastMessage("Signed in successfully to House Haven!");
+      const res = await authApi.login({ email, password });
+      const role = (res?.data?.role || (typeof window !== "undefined" ? localStorage.getItem("userRole") : "") || "").toLowerCase();
+      let roleTitle = "House Haven";
+      if (role === "admin" || role === "super_admin") {
+        roleTitle = "Administrator";
+      } else if (role === "services" || role === "service") {
+        roleTitle = "Service Client";
+      } else if (role === "tenant" || role === "user") {
+        roleTitle = "Tenant";
+      } else if (role === "landlord") {
+        roleTitle = "Landlord";
+      }
+      toast.flash(`Signed in successfully as ${roleTitle}!`);
       setTimeout(() => {
-        setToastMessage(null);
         onLoginSuccess?.();
-      }, 500);
+      }, 350);
     } catch (err: any) {
       console.error("Login error:", err);
       setErrorMessage(err.message || "Failed to sign in. Please check credentials.");
@@ -63,11 +73,10 @@ export function WelcomeBackScreen({
 
     try {
       await authApi.login({ email: adminEmail, password: adminPass });
-      setToastMessage("Signed in as Administrator!");
+      toast.flash("Signed in successfully as Administrator!");
       setTimeout(() => {
-        setToastMessage(null);
         onLoginSuccess?.();
-      }, 500);
+      }, 350);
     } catch (err: any) {
       console.error("Admin Login error:", err);
       setErrorMessage(err.message || "Failed to sign in as admin.");
@@ -189,12 +198,6 @@ export function WelcomeBackScreen({
           </button>
         </div>
       </div>
-
-      {toastMessage && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs py-2 px-4 rounded-full shadow-lg">
-          {toastMessage}
-        </div>
-      )}
     </div>
   );
 }

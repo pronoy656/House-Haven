@@ -71,6 +71,19 @@ export function AdminSidebar({ pendingCount: initialPendingCount }: AdminSidebar
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [userName, setUserName] = useState("Operations Admin");
+  const [userEmail, setUserEmail] = useState("admin@househaven.com");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedName = localStorage.getItem("userName");
+      const storedEmail = localStorage.getItem("userEmail");
+      if (storedName && storedName.trim()) setUserName(storedName.trim());
+      if (storedEmail && storedEmail.trim()) setUserEmail(storedEmail.trim());
+    }
+  }, []);
+
+  const userInitial = userName ? userName.trim().charAt(0).toUpperCase() : "A";
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -316,27 +329,17 @@ export function AdminSidebar({ pendingCount: initialPendingCount }: AdminSidebar
           <Settings className="w-4 h-4" />
           <span>Platform Settings</span>
         </Link>
-
-        {/* Sign Out Nav Item */}
-        <button
-          type="button"
-          onClick={() => setShowLogoutModal(true)}
-          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer text-left"
-        >
-          <LogOut className="w-4 h-4 text-rose-500" />
-          <span>Sign Out</span>
-        </button>
       </nav>
 
       {/* User Card with Quick Logout */}
       <div className="p-3.5 border-t border-slate-100 flex items-center justify-between bg-slate-50/60 shrink-0">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-full bg-[#0891A2] text-white font-bold flex items-center justify-center text-xs shadow-2xs shrink-0">
-            AD
+          <div className="w-8 h-8 rounded-full bg-[#0891A2] text-white font-bold flex items-center justify-center text-xs shadow-2xs shrink-0 select-none">
+            {userInitial}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold text-slate-900 truncate">Operations Admin</p>
-            <p className="text-[11px] text-slate-400 truncate">admin@househaven.com</p>
+            <p className="text-xs font-semibold text-slate-900 truncate">{userName}</p>
+            <p className="text-[11px] text-slate-400 truncate">{userEmail}</p>
           </div>
         </div>
         <button

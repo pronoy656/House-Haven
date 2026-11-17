@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
 import { Button } from "@/components/shared/Button";
 import { Check, Home, User, Wrench } from "lucide-react";
@@ -134,7 +133,7 @@ export function RoleSelectionScreen({
       </div>
 
       {/* Fixed Bottom Action Area */}
-      <div className="shrink-0 z-20 pt-3 space-y-2">
+      <div className="shrink-0 z-20 pt-3 space-y-3">
         <Button
           variant="primary"
           onClick={handleContinue}
@@ -145,7 +144,7 @@ export function RoleSelectionScreen({
         </Button>
 
         {/* Footer Link to Sign In */}
-        <div className="text-center text-xs text-slate-600 font-normal">
+        <div className="text-center text-xs text-slate-600 font-normal py-1">
           Already have an account?{" "}
           <button
             type="button"
@@ -154,28 +153,6 @@ export function RoleSelectionScreen({
           >
             Sign in
           </button>
-        </div>
-
-        {/* Guest Explore Quick Link */}
-        <div className="text-center pt-0.5">
-          <Link
-            href="/services"
-            className="text-xs font-medium text-slate-500 hover:text-[#0891A2] transition-colors inline-flex items-center gap-1"
-          >
-            <span>Just browsing?</span>
-            <span className="font-semibold underline">Explore Services as Guest &rarr;</span>
-          </Link>
-        </div>
-
-        {/* Admin Portal Quick Link */}
-        <div className="text-center pt-0.5">
-          <Link
-            href="/admin/requests"
-            className="text-[11px] font-medium text-slate-400 hover:text-[#0891A2] transition-colors inline-flex items-center gap-1"
-          >
-            <span>Team member?</span>
-            <span className="font-semibold underline">Go to Admin Portal</span>
-          </Link>
         </div>
       </div>
     </div>

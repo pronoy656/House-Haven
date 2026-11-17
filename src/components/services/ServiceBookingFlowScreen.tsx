@@ -22,6 +22,7 @@ import { InputField } from "@/components/shared/InputField";
 import { ScreenHeader } from "@/components/shared/ScreenHeader";
 import { ChooseDateTimeScreen } from "@/components/services/ChooseDateTimeScreen";
 import { serviceRequestApi } from "@/lib/api";
+import { toast } from "@/components/shared/Toast";
 
 export function ServiceBookingFlowScreen() {
   const router = useRouter();
@@ -84,6 +85,9 @@ export function ServiceBookingFlowScreen() {
         setCreatedRequestId(res.data._id);
         setReferenceId(`#SR-${String(res.data._id).slice(-5).toUpperCase()}`);
         setStep("success");
+        toast.success("Service request submitted successfully!", {
+          description: `Reference #${String(res.data._id).slice(-5).toUpperCase()} generated.`,
+        });
         if (typeof window !== "undefined") {
           localStorage.setItem("recentRequestId", res.data._id);
           window.dispatchEvent(new Event("serviceRequestsUpdated"));

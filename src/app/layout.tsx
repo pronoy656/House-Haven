@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NavigationProgressBar } from "@/components/shared/NavigationProgressBar";
+import { ToastContainer } from "@/components/shared/Toast";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <Suspense fallback={null}>
           <NavigationProgressBar />
+          <ToastContainer />
         </Suspense>
         {children}
       </body>
