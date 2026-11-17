@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "House Haven",
-  description: "House Haven - Your premier modern property and real estate platform",
+  title: "Property & Real Estate Portal",
+  description: "Modern property management and maintenance platform",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

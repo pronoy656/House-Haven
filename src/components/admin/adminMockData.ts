@@ -575,7 +575,7 @@ export const ADMIN_TRANSACTIONS: AdminTransaction[] = [
     id: "tx-4",
     referenceNo: "TX-9904",
     type: "Contractor Payout",
-    fromUser: "HouseHaven Escrow",
+    fromUser: "Platform Escrow",
     toUser: "Rapid Flow Plumbing",
     amount: 180,
     platformFee: 0,

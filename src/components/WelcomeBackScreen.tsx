@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { CheckCircle2, ShieldCheck, KeyRound, Check, Sparkles } from "lucide-react";
-import { HouseHavenLogo } from "@/components/shared/HouseHavenLogo";
 import { Button } from "@/components/shared/Button";
 import { InputField } from "@/components/shared/InputField";
 import { authApi } from "@/lib/api";
@@ -41,7 +40,7 @@ export function WelcomeBackScreen({
     try {
       const res = await authApi.login({ email, password });
       const role = (res?.data?.role || (typeof window !== "undefined" ? localStorage.getItem("userRole") : "") || "").toLowerCase();
-      let roleTitle = "House Haven";
+      let roleTitle = "Platform";
       if (role === "admin" || role === "super_admin") {
         roleTitle = "Administrator";
       } else if (role === "services" || role === "service") {
@@ -88,8 +87,8 @@ export function WelcomeBackScreen({
   return (
     <div className="relative w-full h-full max-h-[100dvh] bg-white flex flex-col justify-between p-6 pt-5 pb-6 text-slate-900 overflow-hidden">
       <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col justify-center items-center px-1 py-2">
-        <div className="mb-6 transform hover:scale-105 transition-transform duration-200">
-          <HouseHavenLogo variant="light" width={72} height={92} />
+        <div className="mb-4 w-12 h-12 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#0891A2] shadow-2xs">
+          <KeyRound className="w-6 h-6" />
         </div>
 
         <div className="text-center mb-8">

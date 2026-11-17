@@ -21,7 +21,7 @@ export function SettingsView() {
   const [autoDispatch, setAutoDispatch] = useState(true);
   const [smsAlerts, setSmsAlerts] = useState(true);
   const [emailAlerts, setEmailAlerts] = useState(true);
-  const [supportEmail, setSupportEmail] = useState("operations@househaven.com");
+  const [supportEmail, setSupportEmail] = useState("operations@platform.com");
   const [supportPhone, setSupportPhone] = useState("+44 28 9012 3456");
   const [savedSuccess, setSavedSuccess] = useState(false);
 

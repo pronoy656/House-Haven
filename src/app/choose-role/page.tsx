@@ -24,7 +24,6 @@ export default function ChooseRolePage() {
   return (
     <MobileContainer>
       <RoleSelectionScreen
-        brandTitle="House Haven"
         onContinue={handleContinue}
         onNavigateToSignIn={() => router.push("/login")}
         showStatusBar={true}

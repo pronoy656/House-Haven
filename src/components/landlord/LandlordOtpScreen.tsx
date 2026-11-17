@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
-import { HouseHavenLogo } from "@/components/shared/HouseHavenLogo";
+import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/shared/Button";
 import { InputField } from "@/components/shared/InputField";
 
@@ -69,9 +69,8 @@ export function LandlordOtpScreen({
     <div className="relative w-full h-full max-h-[100dvh] bg-white flex flex-col justify-between p-6 pt-4 pb-6 text-slate-900 overflow-hidden">
       {/* Main Content */}
       <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col items-center justify-center pt-4 pb-4 text-center">
-        {/* House Haven Logo */}
-        <div className="mb-8">
-          <HouseHavenLogo variant="light" width={110} height={70} />
+        <div className="mb-6 w-14 h-14 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#0891A2] shadow-2xs">
+          <ShieldCheck className="w-7 h-7" />
         </div>
 
         {/* Heading & Subtitle */}

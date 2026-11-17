@@ -3,7 +3,7 @@ import { UsersView } from "@/components/admin/UsersView";
 
 export const metadata = {
   title: "Tenants Directory | Admin Portal",
-  description: "View and manage all registered tenants on HouseHaven.",
+  description: "View and manage all registered tenants on the platform.",
 };
 
 export default function AdminTenantsPage() {

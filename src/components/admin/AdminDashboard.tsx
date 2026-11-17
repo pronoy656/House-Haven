@@ -28,7 +28,6 @@ import {
   Home,
   Check,
 } from "lucide-react";
-import { HouseHavenLogo } from "@/components/shared/HouseHavenLogo";
 import {
   Select,
   SelectContent,
@@ -257,12 +256,12 @@ export function AdminDashboard() {
         {/* Brand Header */}
         <div className="p-5 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-1.5 shadow-2xs">
-              <HouseHavenLogo width={28} height={36} variant="light" />
+            <div className="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#0891A2] shadow-2xs">
+              <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-bold text-slate-900 text-base tracking-tight">HouseHaven</span>
+                <span className="font-bold text-slate-900 text-base tracking-tight">Admin Portal</span>
                 <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#0891A2] text-white rounded-md uppercase tracking-wider">
                   Admin
                 </span>
@@ -379,7 +378,7 @@ export function AdminDashboard() {
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold text-slate-900 truncate">Operations Manager</p>
-            <p className="text-[11px] text-slate-400 truncate">admin@househaven.com</p>
+            <p className="text-[11px] text-slate-400 truncate">admin@platform.com</p>
           </div>
         </div>
       </aside>

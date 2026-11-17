@@ -49,32 +49,20 @@ export function SplashScreen({
       <div className="absolute inset-0 z-0">
         <Image
           src={currentSlide === 1 ? "/splash-villa-luxury.jpg" : "/splash-building.jpg"}
-          alt="House Haven Atmosphere"
+          alt="Property Management Platform"
           fill
           priority
           sizes="(max-width: 480px) 100vw, 440px"
           className="object-cover transition-all duration-700 ease-in-out scale-100"
         />
-        {/* Subtle Top Vignette Overlay for logo readability */}
+        {/* Subtle Top Vignette Overlay */}
         <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/70 to-transparent pointer-events-none"></div>
         {/* Bottom Dark Gradient Overlay focused precisely behind text & buttons */}
         <div className="absolute inset-x-0 bottom-0 h-[56%] bg-gradient-to-t from-black/95 via-black/75 to-transparent pointer-events-none"></div>
       </div>
 
-      {/* Top Branding Section */}
-      <div className="shrink-0 relative z-10 px-6 pt-5 pb-2 flex items-center justify-between">
-        <div className="flex flex-col items-start">
-          <Image
-            src="/logo-2.png"
-            alt="House Haven"
-            width={78}
-            height={78}
-            className="w-[72px] sm:w-[78px] h-auto object-contain drop-shadow-xl"
-            style={{ width: "auto", height: "auto" }}
-            priority
-          />
-        </div>
-
+      {/* Top Header Section */}
+      <div className="shrink-0 relative z-10 px-6 pt-5 pb-2 flex items-center justify-end">
         {/* Slide Indicator Dots */}
         <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
           <button

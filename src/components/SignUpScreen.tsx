@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ArrowLeft } from "lucide-react";
-import { HouseHavenLogo } from "@/components/shared/HouseHavenLogo";
+import { ArrowLeft, UserPlus } from "lucide-react";
 import { MobileStatusBar } from "@/components/shared/MobileStatusBar";
 import { Button } from "@/components/shared/Button";
 import { InputField } from "@/components/shared/InputField";
@@ -75,8 +74,8 @@ export function SignUpScreen({
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col justify-center items-center px-1 py-2">
-        <div className="mb-4 shrink-0">
-          <HouseHavenLogo variant="light" width={64} height={82} />
+        <div className="mb-4 w-12 h-12 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#0891A2] shadow-2xs shrink-0">
+          <UserPlus className="w-6 h-6" />
         </div>
 
         <div className="text-center mb-6 shrink-0">
@@ -84,7 +83,7 @@ export function SignUpScreen({
             Create an Account
           </h1>
           <p className="text-xs text-slate-500 mt-1.5 font-normal">
-            Sign up to find your perfect place with House Haven.
+            Sign up to find your perfect place and manage properties.
           </p>
         </div>
 

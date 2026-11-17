@@ -20,7 +20,7 @@ export function AdminUserAvatarMenu() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [userName, setUserName] = useState("Operations Admin");
-  const [userEmail, setUserEmail] = useState("admin@househaven.com");
+  const [userEmail, setUserEmail] = useState("admin@platform.com");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 

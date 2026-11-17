@@ -123,7 +123,7 @@ export function ProfileScreen({
                 Guest Explorer
               </h2>
               <p className="text-xs text-slate-500 leading-relaxed max-w-[280px]">
-                You are currently browsing House Haven property services as a guest. Sign in or register to manage bookings, save addresses, and track technician quotes.
+                You are currently browsing property services as a guest. Sign in or register to manage bookings, save addresses, and track technician quotes.
               </p>
             </div>
 

@@ -442,7 +442,7 @@ export function ServiceQuoteScreen({
 
                 <div className="p-3.5 bg-white border border-amber-100 rounded-2xl text-xs space-y-2 text-slate-600">
                   <p className="text-[11.5px] text-slate-700 leading-relaxed">
-                    Your request for <strong>{issue}</strong> has been logged into the system. The House Haven operations desk is assigning a certified technician to inspect the problem and calculate an itemized price.
+                    Your request for <strong>{issue}</strong> has been logged into the system. The operations desk is assigning a certified technician to inspect the problem and calculate an itemized price.
                   </p>
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
                     <span>Submitted On:</span>
@@ -495,11 +495,11 @@ export function ServiceQuoteScreen({
               {/* Message 2: Operations Response */}
               <div className="flex items-start gap-2.5">
                 <div className="w-7 h-7 rounded-full bg-[#0891A2] text-white flex items-center justify-center text-[10px] font-bold shrink-0">
-                  HH
+                  OP
                 </div>
                 <div className="bg-slate-100 border border-slate-200 text-slate-800 p-3 rounded-2xl rounded-tl-xs text-xs shadow-2xs max-w-[270px] space-y-1">
                   <p className="font-semibold text-slate-900 text-[11.5px]">
-                    House Haven Operations
+                    Operations Desk
                   </p>
                   {isQuoteReady ? (
                     <p className="text-[11px] text-slate-600 leading-relaxed">

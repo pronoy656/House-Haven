@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import { Building2 } from "lucide-react";
 
 interface HouseHavenLogoProps {
   variant?: "light" | "dark";
@@ -11,25 +11,22 @@ interface HouseHavenLogoProps {
 export function HouseHavenLogo({
   variant = "light",
   className = "",
-  width = 72,
-  height = 92,
+  width = 36,
+  height = 36,
 }: HouseHavenLogoProps) {
-  // In splash screens with dark backgrounds, use logo-2.png
-  // Across the overall website (light backgrounds), use logo.png
-  const src = variant === "dark" ? "/logo-2.png" : "/logo.png";
-  const alt = "House Haven Logo";
+  const isDark = variant === "dark";
 
   return (
-    <div className={`flex flex-col items-center select-none ${className}`}>
-      <Image
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        priority
-        className="object-contain h-auto"
-        style={{ width: "auto", height: "auto" }}
-      />
+    <div
+      className={`flex items-center justify-center rounded-xl select-none ${
+        isDark
+          ? "bg-white/10 text-white border border-white/15"
+          : "bg-teal-50 text-[#0891A2] border border-teal-100"
+      } ${className}`}
+      style={{ width: `${width}px`, height: `${height}px` }}
+      aria-label="Platform Icon"
+    >
+      <Building2 className="w-1/2 h-1/2 stroke-[2]" />
     </div>
   );
 }

@@ -8,7 +8,6 @@ import { Check, Home, User, Wrench } from "lucide-react";
 interface RoleSelectionScreenProps {
   onNavigateToSignIn?: () => void;
   onContinue?: (role: string) => void;
-  brandTitle?: string;
   showStatusBar?: boolean;
 }
 
@@ -56,7 +55,6 @@ const ROLES: RoleOption[] = [
 export function RoleSelectionScreen({
   onNavigateToSignIn,
   onContinue,
-  brandTitle = "TenantFind",
   showStatusBar = true,
 }: RoleSelectionScreenProps) {
   const [selectedRole, setSelectedRole] = useState<RoleId>("tenant");
@@ -80,12 +78,12 @@ export function RoleSelectionScreen({
         {/* Title & Subtitle */}
         <div className="text-left mb-5 shrink-0">
           <h1 className="text-[22px] sm:text-[24px] font-bold text-slate-950 tracking-tight leading-snug">
-            How would you like to use
+            How would you like
             <br />
-            {brandTitle}?
+            to get started?
           </h1>
           <p className="text-[12px] sm:text-[13px] text-slate-500 mt-2 font-normal leading-relaxed">
-            Choose the journey that fits you. You can explore services without creating a property profile.
+            Choose the journey that fits you to continue to the platform.
           </p>
         </div>
 

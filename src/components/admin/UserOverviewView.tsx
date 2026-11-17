@@ -640,7 +640,7 @@ export function UserOverviewView() {
               </h2>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              Latest users signed up on House Haven, directly retrieved from MongoDB
+              Latest registered users on the platform, directly retrieved from MongoDB
             </p>
           </div>
 

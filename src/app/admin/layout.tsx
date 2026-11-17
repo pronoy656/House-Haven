@@ -3,7 +3,7 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminAuthGuard } from "@/components/admin/AdminAuthGuard";
 
 export const metadata = {
-  title: "Admin Panel | House Haven",
+  title: "Admin Panel",
   description: "Operations control, service requests, contractor dispatch and quotes management.",
 };
 

@@ -1,7 +1,7 @@
 import { UserOverviewView } from "@/components/admin/UserOverviewView";
 
 export const metadata = {
-  title: "Dashboard Overview | House Haven Admin",
+  title: "Dashboard Overview | Admin",
   description: "Real-time platform analytics, user growth charts, and recent activity.",
 };
 

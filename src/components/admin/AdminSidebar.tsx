@@ -18,8 +18,8 @@ import {
   Menu,
   X,
   LogOut,
+  ShieldCheck,
 } from "lucide-react";
-import { HouseHavenLogo } from "@/components/shared/HouseHavenLogo";
 import { authApi, adminApi } from "@/lib/api";
 
 interface AdminSidebarProps {
@@ -72,7 +72,7 @@ export function AdminSidebar({ pendingCount: initialPendingCount }: AdminSidebar
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [userName, setUserName] = useState("Operations Admin");
-  const [userEmail, setUserEmail] = useState("admin@househaven.com");
+  const [userEmail, setUserEmail] = useState("admin@platform.com");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -144,12 +144,12 @@ export function AdminSidebar({ pendingCount: initialPendingCount }: AdminSidebar
       {/* Brand Header */}
       <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center p-1.5 shadow-2xs">
-            <HouseHavenLogo width={28} height={36} variant="light" />
+          <div className="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#0891A2] shadow-2xs">
+            <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-slate-900 text-base tracking-tight">HouseHaven</span>
+              <span className="font-bold text-slate-900 text-base tracking-tight">Admin Portal</span>
               <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#0891A2] text-white rounded-md uppercase tracking-wider">
                 Admin
               </span>
@@ -361,11 +361,11 @@ export function AdminSidebar({ pendingCount: initialPendingCount }: AdminSidebar
       {/* Mobile Top Navbar with Hamburger Toggle */}
       <header className="md:hidden w-full bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-xs">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center p-1">
-            <HouseHavenLogo width={22} height={28} variant="light" />
+          <div className="w-8 h-8 rounded-lg bg-teal-50 border border-teal-100 flex items-center justify-center text-[#0891A2]">
+            <ShieldCheck className="w-4 h-4" />
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="font-bold text-slate-900 text-sm">HouseHaven</span>
+            <span className="font-bold text-slate-900 text-sm">Admin Portal</span>
             <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#0891A2] text-white rounded uppercase tracking-wider">
               Admin
             </span>
